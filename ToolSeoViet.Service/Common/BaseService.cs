@@ -6,7 +6,8 @@ namespace ToolSeoViet.Services.Common {
     public class BaseService {
         protected readonly ToolSeoVietContext db;
         protected readonly IHttpContextAccessor httpContextAccessor;
-
+        protected readonly string currentUserId;
+        protected readonly string currentUrl;
 
         protected BaseService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor) {
             this.db = db;
@@ -14,9 +15,8 @@ namespace ToolSeoViet.Services.Common {
 
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null) {
-                //this.currentMerchantId = httpContext.User?.FindFirst(o => o.Type == "MerchantId")?.Value;
-                //this.currentUserId = httpContext.User?.FindFirst(o => o.Type == "UserId")?.Value;
-                //this.currentUrl = this.GetCurrentUrl(httpContext.Request);
+                this.currentUserId = httpContext.User?.FindFirst(o => o.Type == "UserId")?.Value ?? "";
+                this.currentUrl = this.GetCurrentUrl(httpContext.Request);
             }
         }
 

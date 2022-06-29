@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolSeoViet.Service", "ToolSeoViet.Service\ToolSeoViet.Service.csproj", "{F28AE741-E47A-4CF7-9890-FDAA5FE4ABC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolSeoViet.Service", "ToolSeoViet.Service\ToolSeoViet.Service.csproj", "{F28AE741-E47A-4CF7-9890-FDAA5FE4ABC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolSeoViet.Database", "ToolSeoViet.Database\ToolSeoViet.Database.csproj", "{06D283C2-515E-47FA-ADE3-F642F994AB03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolSeoViet.Database", "ToolSeoViet.Database\ToolSeoViet.Database.csproj", "{06D283C2-515E-47FA-ADE3-F642F994AB03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolSeoViet.Api", "ToolSeoViet.Api\ToolSeoViet.Api.csproj", "{CEE89CC6-B6DF-4BB9-A9BB-20EC287E3D56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolSeoViet.Api", "ToolSeoViet.Api\ToolSeoViet.Api.csproj", "{CEE89CC6-B6DF-4BB9-A9BB-20EC287E3D56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

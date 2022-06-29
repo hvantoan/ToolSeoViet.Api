@@ -2,13 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+using SeoTool.Models;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Enums;
 using ToolSeoViet.Database.Models;
@@ -17,6 +14,7 @@ using ToolSeoViet.Services.Exceptions;
 using ToolSeoViet.Services.Hashers;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models.Auth;
+using ToolSeoViet.Services.Models.User;
 using ToolSeoViet.Services.Resources;
 
 namespace ToolSeoViet.Services.Implements {
@@ -24,42 +22,101 @@ namespace ToolSeoViet.Services.Implements {
     public class AuthService : BaseService, IAuthService {
         private readonly IConfiguration config;
 
-        public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration config)
+        private readonly UserService userService;
+
+        public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration config, UserService userService)
             : base(db, httpContextAccessor) {
             this.config = config;
+            this.userService = userService;
         }
 
-        //public async Task<LoginResponse> WebLogin(LoginRequest request)
-        //{
+        public async Task<LoginResponse> WebLogin(LoginRequest request) {
 
-        //    var user = await this.db.Users.AsNoTracking().FirstOrDefaultAsync(o => o.MerchantId == merchant.Id && o.Username == request.Username.ToLower().Trim());
-        //    if (user == null)
-        //        throw new UserException(Messages.Auth.Login.User_NotFound);
-        //    if (!user.IsAdmin && !user.IsActive)
-        //        throw new UserException(Messages.Auth.Login.User_Inactive);
-        //    if (!PasswordHashser.Verify(request.Password, user.Password))
-        //        throw new UserException(Messages.Auth.Login.User_IncorrectPassword);
+            var user = await this.db.Users.AsNoTracking().FirstOrDefaultAsync(o => o.Username == request.Username.ToLower().Trim());
+            if (user == null)
+                throw new UserException(Messages.Auth.Login.User_NotFound);
+            if (!user.IsAdmin && !user.IsActive)
+                throw new UserException(Messages.Auth.Login.User_Inactive);
+            if (!PasswordHashser.Verify(request.Password, user.Password))
+                throw new UserException(Messages.Auth.Login.User_IncorrectPassword);
 
-        //    var permissions = await this.db.Permissions.Where(o => o.Type == EPermission.Web).AsNoTracking().ToListAsync();
-        //    Role role = null;
-        //    if (!string.IsNullOrWhiteSpace(user.RoleId))
-        //    {
-        //        role = await this.db.Roles.Include(o => o.RolePermissions).AsNoTracking()
-        //            .FirstOrDefaultAsync(o => o.Id == user.RoleId && o.MerchantId == merchant.Id);
-        //    }
+            var permissions = await this.db.Permisstions.Where(o => o.Type == EPermission.Web).AsNoTracking().ToListAsync();
+            Role role = null;
 
-        //    var userPermissions = UserPermissionDto.MapFromEntities(permissions, role?.RolePermissions?.ToList(), user.IsAdmin);
-        //    var expiredAt = this.GetTokenExpiredAt();
-        //    var claims = this.GetClaimPermissions(userPermissions);
+            if (!string.IsNullOrWhiteSpace(user.RoleId)) {
+                role = await this.db.Roles.Include(o => o.RolePermissions).AsNoTracking().FirstOrDefaultAsync(o => o.Id == user.RoleId);
+            }
 
-        //    return new()
-        //    {
-        //        Token = this.GenerateToken(merchant.Id, user.Id, claims, expiredAt),
-        //        ExpiredTime = new DateTimeOffset(expiredAt).ToUnixTimeMilliseconds(),
-        //        MerchantCode = merchant.Code,
-        //        Username = user.Username,
-        //    };
-        //}
+            var userPermissions = UserPermissionDto.MapFromEntities(permissions, role?.RolePermissions?.ToList(), user.IsAdmin);
+            var expiredAt = this.GetTokenExpiredAt();
+            var claims = this.GetClaimPermissions(userPermissions);
+
+            return new() {
+                Token = this.GenerateToken(user.Id, claims, expiredAt),
+                ExpiredTime = new DateTimeOffset(expiredAt).ToUnixTimeMilliseconds(),
+                Username = user.Username,
+            };
+        }
+
+
+        public async Task<LoginResponse> WebLoginGoogle(LoginGoogleRequest request) {
+            var permissions = await this.db.Permisstions.Where(o => o.Type == EPermission.Web).AsNoTracking().ToListAsync();
+            
+
+            string url = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + request.ExternalToken;
+            using (HttpClient client = new()) {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                try {
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    if (response.IsSuccessStatusCode) {
+                        var data = await response.Content.ReadAsStringAsync();
+                        GoolgeUserInforModel googleObj = Newtonsoft.Json.JsonConvert.DeserializeObject<GoolgeUserInforModel>(data) ?? new GoolgeUserInforModel() { Id = "" };
+                        if (request.ExternalId != googleObj.Id) {
+                            throw new UserException(Messages.Auth.Login.User_NotFound);
+                        }
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+            User userExists = db.Users.FirstOrDefault(o => o.Username == request.Email) ?? new User() { Id = "" };
+            if (userExists.Id.IsNullOrEmpty()) {
+
+                userExists = new User() {
+                    Id = Guid.NewGuid().ToString(),
+                    Username = request.Email,
+                    Password = request.Password,
+                    IsAdmin = false,
+                    Avatar = "",
+                    IsActive = true,
+                    Name = request.Name,
+                    RoleId = "469b14225a79448c93e4e780aa08f0cc"
+                };
+                var result = await userService.CreateOrUpdate(UserDto.FromEntity(userExists));
+
+            }
+
+            User user = this.db.Users.FirstOrDefault(o => o.Username == request.Email) ?? new User() { Id=""};
+
+            Role role = null;
+            if (!string.IsNullOrWhiteSpace(user.RoleId) && !string.IsNullOrEmpty(user.RoleId) ){
+                role = await this.db.Roles.Include(o => o.RolePermissions).AsNoTracking()
+                    .FirstOrDefaultAsync(o => o.Id == user.RoleId) ?? new Role() { Id = ""};
+            }
+
+            var userPermissions = UserPermissionDto.MapFromEntities(permissions, role?.RolePermissions?.ToList(), user.IsAdmin);
+            var expiredAt = this.GetTokenExpiredAt();
+            var claims = this.GetClaimPermissions(userPermissions);
+
+            return new() {
+                Token = this.GenerateToken(user.Id, claims, expiredAt),
+                ExpiredTime = new DateTimeOffset(expiredAt).ToUnixTimeMilliseconds(),
+                Username = user.Username,
+            };
+        }
+
 
         private DateTime GetTokenExpiredAt() {
             var now = DateTime.Now;
@@ -86,7 +143,7 @@ namespace ToolSeoViet.Services.Implements {
         }
 
         private List<Claim> GetClaimPermissions(List<UserPermissionDto> permissions) {
-            List<Claim> claims = new List<Claim>();
+            List<Claim> claims = new();
             foreach (var item in permissions) {
                 if (!item.IsEnable) continue;
                 claims.Add(new Claim(ClaimTypes.Role, item.ClaimName));
