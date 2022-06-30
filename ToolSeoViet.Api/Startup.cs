@@ -20,7 +20,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.IO;
 using System.Text;
-
+using ToolSeoViet.Services.Interfaces;
+using ToolSeoViet.Services.Implements;
 
 namespace ToolSeoViet.Api
 {
@@ -89,8 +90,8 @@ namespace ToolSeoViet.Api
             });
 
             services.AddHttpContextAccessor();
-
-            //services.AddScoped<IAuthService, AuthService>()
+            services.AddScoped<IUserService, UserService>()
+                    .AddScoped<IAuthService, AuthService>();
 
         }
 

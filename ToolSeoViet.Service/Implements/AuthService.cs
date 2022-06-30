@@ -22,12 +22,10 @@ namespace ToolSeoViet.Services.Implements {
     public class AuthService : BaseService, IAuthService {
         private readonly IConfiguration config;
 
-        private readonly UserService userService;
 
-        public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration config, UserService userService)
+        public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration config)
             : base(db, httpContextAccessor) {
             this.config = config;
-            this.userService = userService;
         }
 
         public async Task<LoginResponse> WebLogin(LoginRequest request) {
@@ -94,7 +92,7 @@ namespace ToolSeoViet.Services.Implements {
                     Name = request.Name,
                     RoleId = "469b14225a79448c93e4e780aa08f0cc"
                 };
-                var result = await userService.CreateOrUpdate(UserDto.FromEntity(userExists));
+                //var result = await userService.CreateOrUpdate(UserDto.FromEntity(userExists));
 
             }
 
