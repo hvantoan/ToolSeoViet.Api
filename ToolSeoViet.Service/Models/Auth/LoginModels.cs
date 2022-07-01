@@ -10,7 +10,6 @@
     public class LoginResponse
     {
         public string Token { get; set; }
-        public string UserCode { get; set; }
         public string Username { get; set; }
         public long ExpiredTime { get; set; }
     }
