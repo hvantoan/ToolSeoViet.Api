@@ -8,10 +8,10 @@ using ToolSeoViet.Services.Models.Auth;
 
 namespace ToolSeoViet.Api.Controllers {
     [ApiController, AllowAnonymous, Route("api/auth")]
-    public class AuthorizeController : ControllerBase {
+    public class AuthenticationController : ControllerBase {
         private readonly IAuthService authService;
 
-        public AuthorizeController(IAuthService authService) {
+        public AuthenticationController(IAuthService authService) {
             this.authService = authService;
         }
 
