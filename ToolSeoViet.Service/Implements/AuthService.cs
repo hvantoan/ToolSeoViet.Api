@@ -3,9 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SeoTool.Models;
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Enums;
 using ToolSeoViet.Database.Models;
@@ -47,7 +52,7 @@ namespace ToolSeoViet.Services.Implements {
             }
 
             var userPermissions = UserPermissionDto.MapFromEntities(permissions, role?.RolePermissions?.ToList(), user.IsAdmin);
-            var expiredAt = this.GetTokenExpiredAt();
+            var expiredAt = GetTokenExpiredAt();
             var claims = this.GetClaimPermissions(userPermissions);
 
             return new() {
@@ -112,7 +117,7 @@ namespace ToolSeoViet.Services.Implements {
             }
 
             var userPermissions = UserPermissionDto.MapFromEntities(permissions, role?.RolePermissions?.ToList(), user.IsAdmin);
-            var expiredAt = this.GetTokenExpiredAt();
+            var expiredAt = GetTokenExpiredAt();
             var claims = this.GetClaimPermissions(userPermissions);
 
             return new() {
@@ -123,7 +128,7 @@ namespace ToolSeoViet.Services.Implements {
         }
 
 
-        private DateTime GetTokenExpiredAt() {
+        private static DateTime GetTokenExpiredAt() {
             var now = DateTime.Now;
             var midnight = now.AddDays(1).Date;
             return midnight.Subtract(now).TotalMinutes > 60 ? midnight : midnight.AddDays(1);

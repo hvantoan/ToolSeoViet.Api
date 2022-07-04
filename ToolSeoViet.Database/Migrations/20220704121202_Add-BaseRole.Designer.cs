@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToolSeoViet.Database;
 
@@ -10,9 +11,10 @@ using ToolSeoViet.Database;
 namespace ToolSeoViet.Database.Migrations
 {
     [DbContext(typeof(ToolSeoVietContext))]
-    partial class ToolSeoVietContextModelSnapshot : ModelSnapshot
+    [Migration("20220704121202_Add-BaseRole")]
+    partial class AddBaseRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

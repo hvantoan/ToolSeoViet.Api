@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToolSeoViet.Database;
 
@@ -10,9 +11,10 @@ using ToolSeoViet.Database;
 namespace ToolSeoViet.Database.Migrations
 {
     [DbContext(typeof(ToolSeoVietContext))]
-    partial class ToolSeoVietContextModelSnapshot : ModelSnapshot
+    [Migration("20220704095004_Add-Content")]
+    partial class AddContent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,20 +169,6 @@ namespace ToolSeoViet.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "469b14225a79448c93e4e780aa08f0cc",
-                            Code = "admin",
-                            Name = "Quản trị viên"
-                        },
-                        new
-                        {
-                            Id = "6ffa9fa20755486d9e317d447b652bd8",
-                            Code = "user",
-                            Name = "Người dùng"
-                        });
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.RolePermission", b =>
@@ -201,20 +189,6 @@ namespace ToolSeoViet.Database.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("RolePermission", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            RoleId = "469b14225a79448c93e4e780aa08f0cc",
-                            PermissionId = "ec0f270b424249438540a16e9157c0c8",
-                            IsEnable = true
-                        },
-                        new
-                        {
-                            RoleId = "6ffa9fa20755486d9e317d447b652bd8",
-                            PermissionId = "dc1c2ce584d74428b4e5241a5502787d",
-                            IsEnable = true
-                        });
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContent", b =>

@@ -9,12 +9,13 @@ namespace ToolSeoViet.Database.Models {
         public string RoleId { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string Name{ get; set; }
+        public string Name { get; set; }
         public string Avatar { get; set; }
         public bool IsActive { get; set; }
         public bool IsAdmin { get; set; }
 
         public Role Role { get; set; }
+        public ICollection<SearchContentOnUser> SearchContentOnUsers { get; set; }
     }
 
     public class UserConfig : IEntityTypeConfiguration<User> {
@@ -34,6 +35,7 @@ namespace ToolSeoViet.Database.Models {
 
             // fk
             builder.HasOne(o => o.Role).WithMany(o => o.Users).HasForeignKey(o => o.RoleId);
+            builder.HasMany(o => o.SearchContentOnUsers).WithOne(o => o.User).HasForeignKey(o => o.UserId);
 
         }
     }

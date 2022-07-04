@@ -23,6 +23,15 @@ namespace ToolSeoViet.Database.Models {
             // fk
             builder.HasOne(o => o.Role).WithMany(o => o.RolePermissions).HasForeignKey(o => o.RoleId);
             builder.HasOne(o => o.Permission).WithMany(o => o.RolePermissions).HasForeignKey(o => o.PermissionId);
+            builder.HasData(new RolePermission() {
+                RoleId = "469b14225a79448c93e4e780aa08f0cc",
+                PermissionId = "ec0f270b424249438540a16e9157c0c8",
+                IsEnable = true
+            }, new RolePermission() {
+                RoleId = "6ffa9fa20755486d9e317d447b652bd8",
+                PermissionId = "dc1c2ce584d74428b4e5241a5502787d",
+                IsEnable = true
+            });
         }
     }
 }

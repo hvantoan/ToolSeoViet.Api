@@ -7,8 +7,8 @@ namespace TuanVu.Services.Extensions {
         public static string ToStringN(this Guid guid) {
             return guid.ToString("N");
         }
-
-        public static string? ToStringN(this Guid? guid) {
+        #nullable disable
+        public static string ToStringN(this Guid? guid) {
             return guid?.ToString("N");
         }
     }

@@ -23,20 +23,16 @@ using System.Text;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Implements;
 
-namespace ToolSeoViet.Api
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
+namespace ToolSeoViet.Api {
+    public class Startup {
+        public Startup(IConfiguration configuration) {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+        public void ConfigureServices(IServiceCollection services) {
 
             //services.AddControllers();
 
@@ -47,8 +43,7 @@ namespace ToolSeoViet.Api
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
+                    options.TokenValidationParameters = new TokenValidationParameters {
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateLifetime = true,
@@ -65,8 +60,7 @@ namespace ToolSeoViet.Api
             services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ToolSeoViet.Api", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
                     Description = @"API KEY",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
@@ -96,13 +90,10 @@ namespace ToolSeoViet.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseSwagger().UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToolSeoViet.Api v1"));
 
             app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());

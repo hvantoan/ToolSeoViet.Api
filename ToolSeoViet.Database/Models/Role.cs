@@ -27,6 +27,16 @@ namespace ToolSeoViet.Database.Models {
             // fk
             builder.HasMany(o => o.Users).WithOne(o => o.Role).HasForeignKey(o => o.RoleId);
             builder.HasMany(o => o.RolePermissions).WithOne(o => o.Role).HasForeignKey(o => o.RoleId);
-        }
+
+            builder.HasData(new Role() {
+                Id = "469b14225a79448c93e4e780aa08f0cc",
+                Name = "Quản trị viên",
+                Code = "admin"
+            }, new Role() {
+                Id = "6ffa9fa20755486d9e317d447b652bd8",
+                Code = "user",
+                Name = "Người dùng"
+            });
+        }       
     }
 }
