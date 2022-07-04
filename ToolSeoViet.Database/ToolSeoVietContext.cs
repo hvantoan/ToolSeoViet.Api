@@ -10,10 +10,12 @@ namespace ToolSeoViet.Database {
 
         public DbSet<User> Users { get; set; }
 
+        //Content
         public DbSet<Heading> Headings { get; set; }
         public DbSet<Title> Titles { get; set; }
         public DbSet<SubTitle> SubTitles { get; set; }
-
+        public DbSet<SearchContent> SearchContent { get; set; }
+        public DbSet<SearchContentOnUser> SearchContentOnUsers { get; set; }
 
         public ToolSeoVietContext() {
         }
