@@ -16,6 +16,7 @@ using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models.Auth;
 using ToolSeoViet.Services.Models.User;
 using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Services.Implements {
 
@@ -50,7 +51,7 @@ namespace ToolSeoViet.Services.Implements {
             var claims = this.GetClaimPermissions(userPermissions);
 
             return new() {
-                Token = this.GenerateToken(user.Id, claims, expiredAt),
+                Token = this.GenerateToken(user.Id, user.Username, claims, expiredAt),
                 ExpiredTime = new DateTimeOffset(expiredAt).ToUnixTimeMilliseconds(),
                 Username = user.Username,
             };
@@ -83,20 +84,26 @@ namespace ToolSeoViet.Services.Implements {
             if (userExists.Id.IsNullOrEmpty()) {
 
                 userExists = new User() {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid().ToStringN(),
                     Username = request.Email,
-                    Password = request.Password,
                     IsAdmin = false,
                     Avatar = "",
+                    Name = "",
+                    Password = "",
                     IsActive = true,
-                    Name = request.Name,
                     RoleId = "469b14225a79448c93e4e780aa08f0cc"
                 };
-                //var result = await userService.CreateOrUpdate(UserDto.FromEntity(userExists));
+                db.Users.Add(userExists);
+                db.SaveChanges();
 
             }
 
             User user = this.db.Users.FirstOrDefault(o => o.Username == request.Email) ?? new User() { Id=""};
+
+            if (user == null)
+                throw new UserException(Messages.Auth.Login.User_NotFound);
+            if (!user.IsAdmin && !user.IsActive)
+                throw new UserException(Messages.Auth.Login.User_Inactive);
 
             Role role = null;
             if (!string.IsNullOrWhiteSpace(user.RoleId) && !string.IsNullOrEmpty(user.RoleId) ){
@@ -109,7 +116,7 @@ namespace ToolSeoViet.Services.Implements {
             var claims = this.GetClaimPermissions(userPermissions);
 
             return new() {
-                Token = this.GenerateToken(user.Id, claims, expiredAt),
+                Token = this.GenerateToken(user.Id, user.Username, claims, expiredAt),
                 ExpiredTime = new DateTimeOffset(expiredAt).ToUnixTimeMilliseconds(),
                 Username = user.Username,
             };
@@ -122,12 +129,13 @@ namespace ToolSeoViet.Services.Implements {
             return midnight.Subtract(now).TotalMinutes > 60 ? midnight : midnight.AddDays(1);
         }
 
-        private string GenerateToken(string userId, List<Claim> roleClaims, DateTime expiredAt) {
+        private string GenerateToken(string userId, string username, List<Claim> roleClaims, DateTime expiredAt) {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.config["JwtSecret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>() {
                 new Claim("UserId", userId),
+                new Claim("Username", username)
             };
 
             claims.AddRange(roleClaims);
