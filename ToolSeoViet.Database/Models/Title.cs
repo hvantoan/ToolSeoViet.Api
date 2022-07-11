@@ -6,10 +6,9 @@ namespace ToolSeoViet.Database.Models {
     public partial class Title {
         public string Id { get; set; }
         public string Name { get; set; }
+        public int Position { get; set; }
         public string HeadingId { get; set; }
         public Heading Heading { get; set; }
-
-        public virtual ICollection<SubTitle> SubTitles { get; set; }
     }
     public class TitleConfig : IEntityTypeConfiguration<Title> {
 
@@ -22,7 +21,6 @@ namespace ToolSeoViet.Database.Models {
             builder.Property(o => o.Name).HasMaxLength(32);
             // fk
             builder.HasOne(o => o.Heading).WithMany(o => o.Titles).HasForeignKey(o => o.HeadingId);
-            builder.HasMany(o=> o.SubTitles).WithOne(o=> o.Title).HasForeignKey(o => o.TitleId);
         }
     }
 }

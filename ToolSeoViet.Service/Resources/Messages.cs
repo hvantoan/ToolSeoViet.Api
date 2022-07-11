@@ -37,5 +37,10 @@
             }
         }
 
+        public static class Seo {
+            public static class GetContent {
+            }
+        }
+
     }
 }
