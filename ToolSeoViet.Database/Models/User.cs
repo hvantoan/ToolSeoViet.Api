@@ -15,7 +15,8 @@ namespace ToolSeoViet.Database.Models {
         public bool IsAdmin { get; set; }
 
         public Role Role { get; set; }
-        public ICollection<SearchContentOnUser> SearchContentOnUsers { get; set; }
+        public virtual ICollection<SearchContentOnUser> SearchContentOnUsers { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
     }
 
     public class UserConfig : IEntityTypeConfiguration<User> {
@@ -36,7 +37,7 @@ namespace ToolSeoViet.Database.Models {
             // fk
             builder.HasOne(o => o.Role).WithMany(o => o.Users).HasForeignKey(o => o.RoleId);
             builder.HasMany(o => o.SearchContentOnUsers).WithOne(o => o.User).HasForeignKey(o => o.UserId);
-
+            builder.HasMany(o=>o.Projects).WithOne(o=>o.User).HasForeignKey(o => o.UserId);
         }
     }
 }

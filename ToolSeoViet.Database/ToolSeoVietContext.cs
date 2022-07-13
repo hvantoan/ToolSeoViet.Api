@@ -17,6 +17,10 @@ namespace ToolSeoViet.Database {
         public DbSet<SearchContent> SearchContent { get; set; }
         public DbSet<SearchContentOnUser> SearchContentOnUsers { get; set; }
 
+        public DbSet<Project> Projects { get; set; }
+
+        public DbSet<KeyWord> KeyWords { get; set; }
+
         public ToolSeoVietContext() {
         }
 

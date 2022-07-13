@@ -22,6 +22,8 @@ using System.IO;
 using System.Text;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Implements;
+using ToolSeoViet.Service.Interfaces;
+using ToolSeoViet.Service.Implements;
 
 namespace ToolSeoViet.Api {
     public class Startup {
@@ -85,6 +87,8 @@ namespace ToolSeoViet.Api {
 
             services.AddHttpContextAccessor();
             services.AddScoped<IUserService, UserService>()
+                    .AddScoped<IProjectService, ProjectService>()
+                    
                     .AddScoped<IAuthService, AuthService>();
 
         }
