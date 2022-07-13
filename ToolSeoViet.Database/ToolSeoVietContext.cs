@@ -16,6 +16,10 @@ namespace ToolSeoViet.Database {
         public DbSet<SubTitle> SubTitles { get; set; }
         public DbSet<SearchContent> SearchContent { get; set; }
         public DbSet<SearchContentOnUser> SearchContentOnUsers { get; set; }
+        public DbSet<SLI> SLIs { get; set; }
+        public DbSet<ViDictionary> ViDictionaries { get; set; }
+
+
 
         public DbSet<Project> Projects { get; set; }
 

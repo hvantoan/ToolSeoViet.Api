@@ -24,6 +24,7 @@ using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Implements;
 using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Implements;
+using ToolSeoViet.Service.Utils;
 
 namespace ToolSeoViet.Api {
     public class Startup {
@@ -84,9 +85,13 @@ namespace ToolSeoViet.Api {
                     }
                 });
             });
-
+            services.AddMemoryCache();
             services.AddHttpContextAccessor();
             services.AddScoped<IUserService, UserService>()
+                    .AddTransient<ISeoService, SeoService>()
+                    .AddScoped<IAuthService, AuthService>()
+                    .AddTransient<CacheManager>()
+                    .AddTransient<IViDictionaryService, ViDictionaryService>();
                     .AddScoped<IProjectService, ProjectService>()
                     
                     .AddScoped<IAuthService, AuthService>();

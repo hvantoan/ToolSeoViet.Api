@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Collections.Generic;
 
 namespace ToolSeoViet.Database.Models {
@@ -37,6 +38,18 @@ namespace ToolSeoViet.Database.Models {
             // fk
             builder.HasOne(o => o.Role).WithMany(o => o.Users).HasForeignKey(o => o.RoleId);
             builder.HasMany(o => o.SearchContentOnUsers).WithOne(o => o.User).HasForeignKey(o => o.UserId);
+
+            builder.HasData(new User() {
+                Avatar = "",
+                Id = "92dcba9b0bdd4f32a6170a1322472ead",
+                IsActive = true,
+                IsAdmin = true,
+                Name = "Hồ Văn Toàn",
+                Password = "CcW16ZwR+2SFn8AnpaN+dNakxXvQTI3btbcwpiugge2xYM4H2NfaAD0ZAnOcC4k8HnQLQBGLCpgCtggVfyopgg==",
+                RoleId = "469b14225a79448c93e4e780aa08f0cc",
+                Username = "admin"
+            });
+
             builder.HasMany(o=>o.Projects).WithOne(o=>o.User).HasForeignKey(o => o.UserId);
         }
     }

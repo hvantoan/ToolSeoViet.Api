@@ -1,1 +1,1 @@
-dotnet watch --project ToolSeoViet.Api\ToolSeoViet.Api.csproj run --urls=http://localhost:44308
+dotnet watch --project ToolSeoViet.Api\ToolSeoViet.Api.csproj run --urls=http://localhost:8000

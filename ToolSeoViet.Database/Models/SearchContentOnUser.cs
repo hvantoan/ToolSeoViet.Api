@@ -19,11 +19,9 @@ namespace ToolSeoViet.Database.Models {
 
         public void Configure(EntityTypeBuilder<SearchContentOnUser> builder) {
             builder.ToTable(nameof(SearchContentOnUser));
-
             builder.HasKey(o => new { o.SearchContentId, o.UserId });
             builder.Property(o => o.SearchContentId).HasMaxLength(32);
             builder.Property(o => o.UserId).HasMaxLength(32);
-
             // fk
             builder.HasOne(o => o.User).WithMany(o => o.SearchContentOnUsers).HasForeignKey(o => o.UserId);
             builder.HasOne(o => o.SearchContent).WithMany(o => o.SearchContentOnUsers).HasForeignKey(o => o.SearchContentId);
