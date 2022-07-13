@@ -21,7 +21,7 @@ namespace ToolSeoViet.Service.Extensions {
             webClient.DownloadStringAsync(new Uri(url));
             while (block == 1) {
 
-                Thread.Sleep(3000);
+                Thread.Sleep(10);
             }
             return content;
         }
@@ -29,7 +29,9 @@ namespace ToolSeoViet.Service.Extensions {
         public static string GetHtmlPage(this string strURL) {
             String strResult;
             WebRequest objRequest = WebRequest.Create(strURL);
+            objRequest.Timeout = 2000;
             WebResponse objResponse = objRequest.GetResponse();
+
             using (var sr = new System.IO.StreamReader(objResponse.GetResponseStream())) {
                 strResult = sr.ReadToEnd();
                 sr.Close();

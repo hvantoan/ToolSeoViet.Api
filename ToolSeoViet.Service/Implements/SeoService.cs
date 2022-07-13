@@ -58,18 +58,18 @@ namespace ToolSeoViet.Service.Implements {
                 string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
 
                 string description = WebUtility.HtmlDecode(divList[i].InnerHtml);
-                string heading = WebUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o=>!string.IsNullOrEmpty(o));
+                string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o=>!string.IsNullOrEmpty(o));
                 int index = i+1;
                 Task<HeadingDto> taskTemp = Task.Run(() => {
                     return GetScraping(href.GetHref(), index, heading, dictionaries, totalSLI);
                 });
                 taskList.Add(taskTemp);
             }
-            _ = Task.WhenAll(taskList);
+            await Task.WhenAll(taskList);
             string path = System.IO.Directory.GetCurrentDirectory();
 
             List<HeadingDto> headings = new();
-            for (int i = 0; i < taskList.Count; i++) {//taskList.Count
+            for (int i = 0; i < taskList.Count; i++) {
                 HeadingDto temp = ((Task<HeadingDto>)taskList[i]).Result;
                 headings.Add(temp);
             }
@@ -85,7 +85,7 @@ namespace ToolSeoViet.Service.Implements {
         public static HeadingDto GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
 
             HtmlDocument htmlDocument = new();
-            string htmlDetail = url.GetHtmlPage();
+            string htmlDetail = url.GetHtmlDetail();
             if (htmlDetail == "") {
                 return new HeadingDto() {
                     Href = url.GetHref(),
@@ -106,7 +106,7 @@ namespace ToolSeoViet.Service.Implements {
             if (h2 != null) {
                 foreach (var item1 in h2) {
                     if (item1 != null && !string.IsNullOrEmpty(item1.InnerText)) {
-                        titles = titles.Concat(WebUtility.HtmlDecode(item1.InnerText).SplitGotoRow().Where(s => s != "").Select(o => new Title() {
+                        titles = titles.Concat(WebUtility.HtmlDecode(item1.InnerText).SplitGotoRow().Where(s => !string.IsNullOrEmpty(s)).Select(o => new Title() {
                             Name = o,
                             Position = position
                         })).ToList();
@@ -116,15 +116,13 @@ namespace ToolSeoViet.Service.Implements {
             if (h3 != null) {
                 foreach (var item1 in h3) {
                     if (item1 != null && !string.IsNullOrEmpty(item1.InnerText)) {
-                        subTitles = subTitles.Concat(WebUtility.HtmlDecode(item1.InnerText).SplitGotoRow().Where(s => s != "").Select(o => new SubTitle() {
+                        subTitles = subTitles.Concat(WebUtility.HtmlDecode(item1.InnerText).SplitGotoRow().Where(s => !string.IsNullOrEmpty(s)).Select(o => new SubTitle() {
                             Name = o,
                             Position = position
                         })).ToList();
                     }
                 }
             }
-            Heading heading = new();
-            
             return new() { 
                 Name = h1,
                 Href = url,
