@@ -10,9 +10,11 @@ namespace ToolSeoViet.Database.Models {
     public partial class SearchContent {
         public string Id { get; set; }
         public string Name { get; set; }
-
+        public DateTimeOffset DateCreated { get; set; }
         public virtual ICollection<Heading> Headings { get; set; }
         public virtual ICollection<SearchContentOnUser> SearchContentOnUsers { get; set; }
+        public virtual ICollection<SLI> SLIs { get; set; }
+
     }
 
     public class SearchContentConfig : IEntityTypeConfiguration<SearchContent> {
@@ -27,6 +29,7 @@ namespace ToolSeoViet.Database.Models {
             // fk
             builder.HasMany(o => o.Headings).WithOne(o => o.SearchContent).HasForeignKey(o => o.SearchContentId);
             builder.HasMany(o => o.SearchContentOnUsers).WithOne(o => o.SearchContent).HasForeignKey(o => o.SearchContentId);
+            builder.HasMany(o => o.SLIs).WithOne(o => o.SearchContent).HasForeignKey(o => o.SearchContentId);
         }
     }
 }

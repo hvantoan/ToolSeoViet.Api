@@ -10,8 +10,9 @@ namespace ToolSeoViet.Database.Models {
     public partial class SubTitle {
         public string Id { get; set; }
         public string Name { get; set; }
-        public string TitleId { get; set; }
-        public Title Title { get; set; }
+        public int Position { get; set; }
+        public string HeadingId { get; set; }
+        public Heading Heading { get; set; }
     }
 
     public class SubTitleConfig : IEntityTypeConfiguration<SubTitle> {
@@ -21,10 +22,10 @@ namespace ToolSeoViet.Database.Models {
 
             builder.HasKey(o => o.Id);
             builder.Property(o => o.Id).HasMaxLength(32);
-            builder.Property(o => o.TitleId).HasMaxLength(32);
+            builder.Property(o => o.HeadingId).HasMaxLength(32);
             builder.Property(o => o.Name).HasMaxLength(255).IsRequired();
             // fk
-            builder.HasOne(o => o.Title).WithMany(o => o.SubTitles).HasForeignKey(o => o.TitleId);
+            builder.HasOne(o => o.Heading).WithMany(o => o.SubTitles).HasForeignKey(o => o.HeadingId);
 
         }
     }

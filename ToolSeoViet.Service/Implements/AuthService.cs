@@ -19,19 +19,18 @@ using ToolSeoViet.Services.Exceptions;
 using ToolSeoViet.Services.Hashers;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models.Auth;
-using ToolSeoViet.Services.Models.User;
 using ToolSeoViet.Services.Resources;
 using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Services.Implements {
 
     public class AuthService : BaseService, IAuthService {
-        private readonly IConfiguration config;
+        private readonly IConfiguration configuration;
 
 
-        public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration config)
-            : base(db, httpContextAccessor) {
-            this.config = config;
+        public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+            : base(db, httpContextAccessor, configuration) {
+            this.configuration = configuration;
         }
 
         public async Task<LoginResponse> WebLogin(LoginRequest request) {
@@ -135,7 +134,7 @@ namespace ToolSeoViet.Services.Implements {
         }
 
         private string GenerateToken(string userId, string username, List<Claim> roleClaims, DateTime expiredAt) {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.config["JwtSecret"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["JwtSecret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>() {
