@@ -10,9 +10,8 @@ namespace ToolSeoViet.Service.Interfaces
 {
     public interface IProjectService
     {
-        Task<ListProjectResponse> All(GetProjectRequest request);
-        Task<Project> Get(GetProjectRequest request);
-        Task<SaveProjact>Save(PostProjectModel request);
+        Task<ProjectDto> Get(GetProjectRequest request);
+        Task CreateOrUpdate(ProjectDto request);
 
     }
 }

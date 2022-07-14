@@ -12,12 +12,9 @@ namespace ToolSeoViet.Database.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string Domain { get; set; }
-
         public string UserId { get; set; }
         public User User { get; set; }
-
         public virtual ICollection<KeyWord> KeyWords { get; set; }
-        public string Url { get; set; }
     }
     public class ProjectConfig : IEntityTypeConfiguration<Project>
     {

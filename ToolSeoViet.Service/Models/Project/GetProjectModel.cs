@@ -10,7 +10,10 @@ namespace ToolSeoViet.Service.Models.Project
 
     public class GetProjectRequest : BaseGetRequest
     {
+    }
 
-
+    public class GetProjectOfUser
+    {
+        public string UserId { get; set; }
     }
 }

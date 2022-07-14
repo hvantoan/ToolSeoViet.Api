@@ -14,7 +14,6 @@ namespace ToolSeoViet.Service.Models.Seo {
     }
 
     public partial class TitleDto {
-
         public static TitleDto FromEntity(ToolSeoViet.Database.Models.Title entity) {
             if (entity == null) return default;
 
