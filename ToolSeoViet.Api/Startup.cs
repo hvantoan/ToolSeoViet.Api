@@ -88,7 +88,8 @@ namespace ToolSeoViet.Api {
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
             services.AddScoped<IUserService, UserService>()
-                    .AddTransient<ISeoService, SeoService>()
+                    .AddScoped<ISearchContentService, SearchContentService>()
+                    .AddScoped<ISeoService, SeoService>()
                     .AddScoped<IAuthService, AuthService>()
                     .AddTransient<CacheManager>()
                     .AddTransient<IViDictionaryService, ViDictionaryService>();

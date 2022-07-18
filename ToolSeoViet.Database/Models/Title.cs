@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Collections.Generic;
 
 namespace ToolSeoViet.Database.Models {
@@ -18,7 +19,8 @@ namespace ToolSeoViet.Database.Models {
             builder.HasKey(o => o.Id);
             builder.Property(o => o.Id).HasMaxLength(32);
             builder.Property(o => o.HeadingId).HasMaxLength(32).IsRequired();
-            builder.Property(o => o.Name).HasMaxLength(32);
+            builder.Property(o => o.Name).HasMaxLength(Int32.MaxValue);
+            builder.Property(o => o.Position);
             // fk
             builder.HasOne(o => o.Heading).WithMany(o => o.Titles).HasForeignKey(o => o.HeadingId);
         }

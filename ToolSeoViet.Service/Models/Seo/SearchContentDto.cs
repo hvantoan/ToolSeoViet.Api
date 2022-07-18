@@ -11,7 +11,6 @@ namespace ToolSeoViet.Service.Models.Seo {
     }
 
     public partial class SearchContentDto {
-
         public static SearchContentDto FromEntity(ToolSeoViet.Database.Models.SearchContent entity,
             List<ToolSeoViet.Database.Models.Heading> headings = null) {
             if (entity == null) return default;

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
@@ -21,12 +20,14 @@ namespace ToolSeoViet.Service.Implements {
     public class SeoService : BaseService, ISeoService {
 
         public readonly IViDictionaryService viDictionaryService;
+        public readonly ISearchContentService searchContentService;
         public readonly CacheManager cacheManager;
 
-        public SeoService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IViDictionaryService viDictionaryService, IMemoryCache memoryCache)
+        public SeoService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IViDictionaryService viDictionaryService, IMemoryCache memoryCache, ISearchContentService searchContentService)
             : base(db, httpContextAccessor, configuration) {
             this.viDictionaryService = viDictionaryService;
             this.cacheManager = new CacheManager(memoryCache, viDictionaryService);
+            this.searchContentService = searchContentService;
         }
 
         public async Task<SearchContentDto> GetContennt(SearchContentRequest request) {
@@ -41,7 +42,7 @@ namespace ToolSeoViet.Service.Implements {
             string divClass = configuration["SeoToolConfig:divCSS"];
             string devDescription = configuration["SeoToolConfig:divDescription"];
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
-            List<Task> taskList = new ();
+            List<Task> taskList = new();
             Dictionary<string, ViDictionary> dictionaries = cacheManager.GetViDictionaries;
             List<string> totalSLI = new();
             for (int i = 0; i < divList.Count; i++) {
@@ -56,10 +57,9 @@ namespace ToolSeoViet.Service.Implements {
                     continue;
 
                 string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
-
                 string description = WebUtility.HtmlDecode(divList[i].InnerHtml);
-                string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o=>!string.IsNullOrEmpty(o));
-                int index = i+1;
+                string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o => !string.IsNullOrEmpty(o));
+                int index = i + 1;
                 Task<HeadingDto> taskTemp = Task.Run(() => {
                     return GetScraping(href.GetHref(), index, heading, dictionaries, totalSLI);
                 });
@@ -74,12 +74,14 @@ namespace ToolSeoViet.Service.Implements {
                 headings.Add(temp);
             }
 
-
-            return new() {
-                DateCreated =DateTimeOffset.Now,
+            var searchContent = new SearchContentDto() {
+                DateCreated = DateTimeOffset.Now,
                 Headings = headings ?? new List<HeadingDto>(),
-                Name = request.KeyWord
+                Name = request.KeyWord.Replace("+", " ")
             };
+            await searchContentService.Save(searchContent);
+
+            return searchContent;
         }
 
         public static HeadingDto GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
@@ -123,11 +125,11 @@ namespace ToolSeoViet.Service.Implements {
                     }
                 }
             }
-            return new() { 
+            return new() {
                 Name = h1,
                 Href = url,
                 Position = position,
-                SubTitles = subTitles?.Select(o=>SubTitleDto.FromEntity(o)).ToList() ?? new List<SubTitleDto>(),
+                SubTitles = subTitles?.Select(o => SubTitleDto.FromEntity(o)).ToList() ?? new List<SubTitleDto>(),
                 Titles = titles?.Select(o => TitleDto.FromEntity(o)).ToList() ?? new List<TitleDto>(),
             };
         }
