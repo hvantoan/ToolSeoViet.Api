@@ -57,8 +57,12 @@
         }
 
         public static class Seo {
-            public static class GetContent {
-            }
+        }
+
+        public static class SearchContent {
+            public const string SearchContent_IsEmpty = "Không có lịch sử tìm kiếm nào.";
+            public const string SearchContent_NotFound = "Nội dung không tồn tại.";
+
         }
 
     }

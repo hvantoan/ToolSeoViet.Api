@@ -23,7 +23,8 @@ namespace ToolSeoViet.Database.Models {
 
             builder.HasKey(o => o.Id);
             builder.Property(o => o.Id).HasMaxLength(32);
-            builder.Property(o => o.Name).HasMaxLength(255);
+            builder.Property(o => o.SearchContentId).HasMaxLength(32);
+            builder.Property(o => o.Name).HasMaxLength(Int32.MaxValue);
             builder.Property(o => o.Href).HasMaxLength(Int32.MaxValue);
 
             // fk
