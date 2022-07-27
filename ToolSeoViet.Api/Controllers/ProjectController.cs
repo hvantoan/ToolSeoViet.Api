@@ -10,20 +10,5 @@ namespace ToolSeoViet.Api.Controllers {
         public ProjectController(IProjectService projectService) {
             this.projectService = projectService;
         }
-
-        
-        //[HttpPost, Route("Get")]
-        //public async Task<BaseResponse> Get(GetProjectRequest request)
-        //{
-        //    //try
-        //    //{
-        //    //    var response = await this.projectService.Get(request.Id);
-        //    //    return BaseResponse<ListProjectResponse>.Ok(a);
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    return BaseResponse.Fail(ex.Message);
-        //    //}
-        //}
     }
 }

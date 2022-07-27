@@ -31,23 +31,23 @@ namespace ToolSeoViet.Service.Implements {
 
             foreach (var item in searchContents) searchContentsDto.Add(SearchContentDto.FromEntity(item));
 
-            return new() {
+            return await Task.FromResult(new ListSearchContentResponse() {
                 Count = searchContentsDto.Count(),
                 Items = searchContentsDto
-            };
+            });
         }
         public async Task<SearchContentDto> Get(GetSearchContent request) {
-            var data = await this.db.SearchContents.AsNoTracking().Where(o => o.Id == request.Id && o.UserId == currentUserId).FirstOrDefaultAsync();
+            var data = this.db.SearchContents.AsNoTracking().Where(o => o.Id == request.Id && o.UserId == currentUserId).FirstOrDefault();
             if (data == null) throw new SearchContentException(Messages.SearchContent.SearchContent_NotFound);
-            var headings = await this.db.Headings.AsNoTracking().Include(o => o.Titles).Include(o => o.SubTitles).Where(o => o.SearchContentId == data.Id).ToListAsync();
-            return new() {
+            if (data == null) throw new SearchContentException(Messages.SearchContent.SearchContent_NotFound);
+            var headings =  this.db.Headings.Include(o => o.Titles).Include(o => o.SubTitles).AsNoTracking().Where(o => o.SearchContentId == data.Id);
+            return await Task.FromResult(new SearchContentDto() {
                 DateCreated = data.DateCreated,
                 Id = data.Id,
                 Headings = headings.Select(o => HeadingDto.FromEntity(o, o.Titles.ToList(), o.SubTitles.ToList())).ToList(),
                 Name = data.Name
-            };
+            });
         }
-
         public async Task Save(SearchContentDto searchContent) {
             var data = new SearchContent() {
                 Id = Guid.NewGuid().ToStringN(),

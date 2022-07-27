@@ -40,19 +40,6 @@ namespace ToolSeoViet.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SearchContent",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SearchContent", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ViDictionary",
                 columns: table => new
                 {
@@ -115,14 +102,75 @@ namespace ToolSeoViet.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Project",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Domain = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Project", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Project_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SearchContent",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SearchContent", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SearchContent_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KeyWord",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CurrentPosition = table.Column<int>(type: "int", nullable: false),
+                    BestPosition = table.Column<int>(type: "int", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    ProjectId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KeyWord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_KeyWord_Project_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Project",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Heading",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
                     Href = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
-                    SearchContentId = table.Column<string>(type: "nvarchar(32)", nullable: true)
+                    SearchContentId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -154,35 +202,12 @@ namespace ToolSeoViet.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SearchContentOnUser",
-                columns: table => new
-                {
-                    SearchContentId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SearchContentOnUser", x => new { x.SearchContentId, x.UserId });
-                    table.ForeignKey(
-                        name: "FK_SearchContentOnUser_SearchContent_SearchContentId",
-                        column: x => x.SearchContentId,
-                        principalTable: "SearchContent",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SearchContentOnUser_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SubTitle",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    Position = table.Column<int>(type: "int", nullable: false),
                     HeadingId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
@@ -200,7 +225,8 @@ namespace ToolSeoViet.Database.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    Position = table.Column<int>(type: "int", nullable: false),
                     HeadingId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
@@ -258,13 +284,23 @@ namespace ToolSeoViet.Database.Migrations
                 column: "SearchContentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_KeyWord_ProjectId",
+                table: "KeyWord",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Project_UserId",
+                table: "Project",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermission_PermissionId",
                 table: "RolePermission",
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SearchContentOnUser_UserId",
-                table: "SearchContentOnUser",
+                name: "IX_SearchContent_UserId",
+                table: "SearchContent",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -291,10 +327,10 @@ namespace ToolSeoViet.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "RolePermission");
+                name: "KeyWord");
 
             migrationBuilder.DropTable(
-                name: "SearchContentOnUser");
+                name: "RolePermission");
 
             migrationBuilder.DropTable(
                 name: "SLI");
@@ -309,19 +345,22 @@ namespace ToolSeoViet.Database.Migrations
                 name: "ViDictionary");
 
             migrationBuilder.DropTable(
-                name: "Permission");
+                name: "Project");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Permission");
 
             migrationBuilder.DropTable(
                 name: "Heading");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "SearchContent");
 
             migrationBuilder.DropTable(
-                name: "SearchContent");
+                name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Role");
         }
     }
 }

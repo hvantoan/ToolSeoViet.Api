@@ -10,6 +10,7 @@ namespace ToolSeoViet.Service.Interfaces {
     public interface ISearchContentService {
         Task<ListSearchContentResponse> All();
         Task Save(SearchContentDto searchContent);
+        Task<SearchContentDto> Get(GetSearchContent request);
 
     }
 }

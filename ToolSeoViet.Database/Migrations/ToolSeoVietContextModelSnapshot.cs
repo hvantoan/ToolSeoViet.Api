@@ -588,6 +588,8 @@ namespace ToolSeoViet.Database.Migrations
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.User", b =>
                 {
+                    b.Navigation("Projects");
+
                     b.Navigation("SearchContents");
                 });
 #pragma warning restore 612, 618

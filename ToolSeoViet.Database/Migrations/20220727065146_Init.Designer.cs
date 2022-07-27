@@ -12,8 +12,8 @@ using ToolSeoViet.Database;
 namespace ToolSeoViet.Database.Migrations
 {
     [DbContext(typeof(ToolSeoVietContext))]
-    [Migration("20220713042625_Add-project")]
-    partial class Addproject
+    [Migration("20220727065146_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,13 +35,14 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
                     b.Property<string>("SearchContentId")
+                        .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
                     b.HasKey("Id");
@@ -298,29 +299,18 @@ namespace ToolSeoViet.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SearchContent", (string)null);
-                });
-
-            modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContentOnUser", b =>
-                {
-                    b.Property<string>("SearchContentId")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
-                    b.HasKey("SearchContentId", "UserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SearchContentOnUser", (string)null);
+                    b.ToTable("SearchContent", (string)null);
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.SLI", b =>
@@ -359,9 +349,8 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
@@ -385,8 +374,8 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
@@ -521,21 +510,11 @@ namespace ToolSeoViet.Database.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContentOnUser", b =>
+            modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContent", b =>
                 {
-                    b.HasOne("ToolSeoViet.Database.Models.SearchContent", "SearchContent")
-                        .WithMany("SearchContentOnUsers")
-                        .HasForeignKey("SearchContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ToolSeoViet.Database.Models.User", "User")
-                        .WithMany("SearchContentOnUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SearchContent");
+                        .WithMany("SearchContents")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -607,15 +586,13 @@ namespace ToolSeoViet.Database.Migrations
                     b.Navigation("Headings");
 
                     b.Navigation("SLIs");
-
-                    b.Navigation("SearchContentOnUsers");
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.User", b =>
                 {
                     b.Navigation("Projects");
 
-                    b.Navigation("SearchContentOnUsers");
+                    b.Navigation("SearchContents");
                 });
 #pragma warning restore 612, 618
         }

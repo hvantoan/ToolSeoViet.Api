@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.SearchContent;
+using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Services.Models;
 
 namespace ToolSeoViet.Api.Controllers {
@@ -20,6 +21,16 @@ namespace ToolSeoViet.Api.Controllers {
             try {
                 var response = await this.searchContentService.All();
                 return BaseResponse<ListSearchContentResponse>.Ok(response);
+            } catch (Exception ex) {
+                return BaseResponse.Fail(ex.Message);
+            }
+        }
+
+        [HttpPost, Route("get")]
+        public async Task<BaseResponse> Get(GetSearchContent request) {
+            try {
+                var response = await this.searchContentService.Get(request);
+                return BaseResponse<SearchContentDto>.Ok(response);
             } catch (Exception ex) {
                 return BaseResponse.Fail(ex.Message);
             }
