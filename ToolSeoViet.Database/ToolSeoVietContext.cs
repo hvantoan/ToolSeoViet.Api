@@ -20,6 +20,10 @@ namespace ToolSeoViet.Database {
 
 
 
+        public DbSet<Project> Projects { get; set; }
+
+        public DbSet<KeyWord> KeyWords { get; set; }
+
         public ToolSeoVietContext() {
         }
 

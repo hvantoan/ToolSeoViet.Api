@@ -17,6 +17,7 @@ namespace ToolSeoViet.Database.Models {
 
         public Role Role { get; set; }
         public ICollection<SearchContent> SearchContents { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
     }
 
     public class UserConfig : IEntityTypeConfiguration<User> {
@@ -49,6 +50,7 @@ namespace ToolSeoViet.Database.Models {
                 Username = "admin"
             });
 
+            builder.HasMany(o=>o.Projects).WithOne(o=>o.User).HasForeignKey(o => o.UserId);
         }
     }
 }

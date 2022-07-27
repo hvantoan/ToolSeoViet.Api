@@ -33,5 +33,7 @@ namespace ToolSeoViet.Api.Controllers {
                 return BaseResponse.Fail(ex.Message);
             }
         }
+
+       
     }
 }

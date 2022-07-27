@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToolSeoViet.Database;
 
@@ -11,9 +12,10 @@ using ToolSeoViet.Database;
 namespace ToolSeoViet.Database.Migrations
 {
     [DbContext(typeof(ToolSeoVietContext))]
-    partial class ToolSeoVietContextModelSnapshot : ModelSnapshot
+    [Migration("20220713042625_Add-project")]
+    partial class Addproject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,14 +35,13 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
                     b.Property<string>("SearchContentId")
-                        .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
                     b.HasKey("Id");
@@ -297,18 +298,29 @@ namespace ToolSeoViet.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SearchContent", (string)null);
+                });
+
+            modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContentOnUser", b =>
+                {
+                    b.Property<string>("SearchContentId")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("UserId")
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
-                    b.HasKey("Id");
+                    b.HasKey("SearchContentId", "UserId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SearchContent", (string)null);
+                    b.ToTable("SearchContentOnUser", (string)null);
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.SLI", b =>
@@ -347,8 +359,9 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
@@ -372,8 +385,8 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
@@ -508,11 +521,21 @@ namespace ToolSeoViet.Database.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContent", b =>
+            modelBuilder.Entity("ToolSeoViet.Database.Models.SearchContentOnUser", b =>
                 {
+                    b.HasOne("ToolSeoViet.Database.Models.SearchContent", "SearchContent")
+                        .WithMany("SearchContentOnUsers")
+                        .HasForeignKey("SearchContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ToolSeoViet.Database.Models.User", "User")
-                        .WithMany("SearchContents")
-                        .HasForeignKey("UserId");
+                        .WithMany("SearchContentOnUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SearchContent");
 
                     b.Navigation("User");
                 });
@@ -584,11 +607,15 @@ namespace ToolSeoViet.Database.Migrations
                     b.Navigation("Headings");
 
                     b.Navigation("SLIs");
+
+                    b.Navigation("SearchContentOnUsers");
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.User", b =>
                 {
-                    b.Navigation("SearchContents");
+                    b.Navigation("Projects");
+
+                    b.Navigation("SearchContentOnUsers");
                 });
 #pragma warning restore 612, 618
         }

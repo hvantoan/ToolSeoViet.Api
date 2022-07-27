@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using ToolSeoViet.Database.Models;
 
 namespace ToolSeoViet.Services.Models {
 
@@ -25,6 +27,11 @@ namespace ToolSeoViet.Services.Models {
 
         public static BaseResponse<T> Ok(T data) {
             return new() { Success = true, Data = data };
+        }
+
+        public static BaseResponse Ok(Project response)
+        {
+            throw new NotImplementedException();
         }
     }
 
