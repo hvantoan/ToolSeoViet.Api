@@ -59,13 +59,15 @@ namespace ToolSeoViet.Service.Implements {
                 string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
                 string description = WebUtility.HtmlDecode(divList[i].InnerHtml);
                 string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o => !string.IsNullOrEmpty(o));
-                int index = i + 1;
-                Task<HeadingDto> taskTemp = Task.Run(() => {
-                    return GetScraping(href.GetHref(), index, heading, dictionaries, totalSLI);
-                });
-                taskList.Add(taskTemp);
+                int position = i + 1;
+
+                await GetScraping(href.GetHref(), position, heading, dictionaries, totalSLI);
+                //Task<HeadingDto> taskTemp = Task.Run(() => {
+                //    return GetScraping(href.GetHref(), index, heading, dictionaries, totalSLI);
+                //});
+                //taskList.Add(taskTemp);
             }
-            await Task.WhenAll(taskList);
+            //await Task.WhenAll(taskList);
             string path = System.IO.Directory.GetCurrentDirectory();
 
             List<HeadingDto> headings = new();
@@ -84,7 +86,7 @@ namespace ToolSeoViet.Service.Implements {
             return searchContent;
         }
 
-        public static HeadingDto GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
+        public async Task<HeadingDto> GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
 
             HtmlDocument htmlDocument = new();
             string htmlDetail = url.GetHtmlDetail();
@@ -100,6 +102,14 @@ namespace ToolSeoViet.Service.Implements {
             }
 
             htmlDocument.LoadHtml(htmlDetail);
+            var body = htmlDocument.DocumentNode.SelectSingleNode("//body");
+
+            List<string> data = new();
+            if (body != null) {
+                data = body.GetBodyStr();
+                totalSLI = await GetSLI(data, dictionaries, totalSLI);
+            }
+
             var h2 = htmlDocument.DocumentNode.SelectNodes("//body//h2");
             var h3 = htmlDocument.DocumentNode.SelectNodes("//body//h3");
             var titles = new List<Title>();
@@ -131,9 +141,100 @@ namespace ToolSeoViet.Service.Implements {
                 Position = position,
                 SubTitles = subTitles?.Select(o => SubTitleDto.FromEntity(o)).ToList() ?? new List<SubTitleDto>(),
                 Titles = titles?.Select(o => TitleDto.FromEntity(o)).ToList() ?? new List<TitleDto>(),
+                TotalSLI = totalSLI
             };
         }
 
+        public async Task<List<string>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
+            Dictionary<string, int> wordDic = new Dictionary<string, int>();
+            for (int i = 0; i < wordsList.Count; i++) {
+                List<string> strTemp = wordsList[i].Split(new string[] { " ", "," }, StringSplitOptions.None).ToList();
+                for (int j = 0; j < strTemp.Count - 1; j++) {
+                    string str = strTemp[j].getStr() + " " + strTemp[j + 1].getStr();
+                    if (wordDic.ContainsKey(str)) {
+                        wordDic[str]++;
+                    } else {
+                        wordDic.Add(str, 1);
+                    }
+                }
+            }
+            List<string> listTemp = new List<string>();
+            List<SLIKeyModel> keyModelList = wordDic.Select(s => new SLIKeyModel { Count = s.Value, KeyWord = s.Key }).OrderByDescending(s => s.Count).ToList();
 
+            List<Task> tasks = new();
+            for (int i = 0; i < keyModelList.Count; i++) {
+                if (dictionaries.ContainsKey(keyModelList[i].KeyWord.Trim())) {
+                    if (dictionaries[keyModelList[i].KeyWord.Trim().ToLower()].IsMeaning != true) {
+                        continue;
+                    }
+                    totalSLI.Add(keyModelList[i].KeyWord);
+                    if (i < 50 || keyModelList[i].Count > 2)
+                        listTemp.Add(keyModelList[i].KeyAndCount);
+                } else {
+
+                    Task<ViDictionary> tmp = Task.Run(() => SearchDictionary(keyModelList[i].KeyWord.Trim()));
+                    tasks.Add(tmp);
+
+                    //if (await SearchDictionary(keyModelList[i].KeyWord.Trim())) {
+                    //    //totalSLI.Add(keyModelList[i].KeyWord);
+                    //    //if (i < 50 || keyModelList[i].Count > 2)
+                    //    //    listTemp.Add(keyModelList[i].KeyAndCount);
+                    //}
+
+                }
+                Task.Delay(100).Wait();
+            }
+            await Task.WhenAll(tasks);
+
+            for (int i = 0; i < tasks.Count; i++) {
+                ViDictionary temp = ((Task<ViDictionary>) tasks[i]).Result;
+                await viDictionaryService.InsertKeyWord(temp);
+            }
+
+            return listTemp;
+        }
+
+        public async Task<ViDictionary> SearchDictionary(string word) {
+            string url = "http://tratu.soha.vn/dict/vn_vn/" + word;
+            HtmlDocument htmlDocument = new();
+            string htmlDetail = url.GetHtmlDetail();
+
+            if (htmlDetail == null) return new ViDictionary() {
+                Word = word,
+                Description = "",
+                IsMeaning = false
+            };
+
+            htmlDocument.LoadHtml(htmlDetail);
+            string soha = configuration["SeoToolConfig:soha"];
+            var span = htmlDocument.DocumentNode.SelectNodes("//span[contains(@class,'" + soha + "')]");
+            if (span != null) {
+                //await viDictionaryService.InsertKeyWord(new ViDictionary() {
+                //    Word = word,
+                //    Description = span.Count > 1 ? span[1].InnerText.Trim() : "",
+                //    IsMeaning = true
+                //});
+                return new ViDictionary() {
+                    Word = word,
+                    Description = span.Count > 1 ? span[1].InnerText.Trim() : "",
+                    IsMeaning = true
+                };
+            }
+            //await viDictionaryService.InsertKeyWord(new ViDictionary() {
+            //    Word = word,
+            //    Description = "",
+            //    IsMeaning = false
+            //});
+
+            return new ViDictionary() {
+                Word = word,
+                Description = "",
+                IsMeaning = false
+            };
+
+        }
     }
+
+
+
 }

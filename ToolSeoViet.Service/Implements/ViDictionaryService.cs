@@ -22,14 +22,19 @@ namespace ToolSeoViet.Service.Implements {
             return db.ViDictionaries.AsQueryable().ToList();
         }
 
-        public void InsertKeyWord(ViDictionary dictionary) {
-            db.ViDictionaries.Add(new ViDictionary() {
-                Id = Guid.NewGuid().ToStringN(),
-                Description = dictionary.Description,
-                Word = dictionary.Word,
-                IsMeaning = dictionary.IsMeaning,
-            });
-            db.SaveChanges();
+        public async Task InsertKeyWord(ViDictionary dictionary) {
+            bool isExiting = db.ViDictionaries.Any(o => o.Word.Equals(dictionary.Word));
+            if (isExiting) return;
+            try {
+                db.ViDictionaries.Add(new ViDictionary() {
+                    Id = Guid.NewGuid().ToStringN(),
+                    Description = dictionary.Description,
+                    Word = dictionary.Word,
+                    IsMeaning = dictionary.IsMeaning,
+                });
+                await db.SaveChangesAsync();
+            } catch (Exception ex) { }
+
         }
     }
 }

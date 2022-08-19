@@ -26,6 +26,7 @@ namespace ToolSeoViet.Database.Models
             builder.Property(o => o.Name).HasMaxLength(255).IsRequired();
             builder.Property(o => o.Domain).HasMaxLength(255).IsRequired();
             builder.Property(o => o.UserId).HasMaxLength(32).IsRequired();
+
             //fk
             builder.HasMany(o => o.KeyWords).WithOne(o => o.Project).HasForeignKey(o => o.ProjectId);
             builder.HasOne(o=>o.User).WithMany(o=>o.Projects).HasForeignKey(o => o.UserId);

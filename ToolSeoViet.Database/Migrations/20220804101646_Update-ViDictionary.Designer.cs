@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToolSeoViet.Database;
 
@@ -11,9 +12,10 @@ using ToolSeoViet.Database;
 namespace ToolSeoViet.Database.Migrations
 {
     [DbContext(typeof(ToolSeoVietContext))]
-    partial class ToolSeoVietContextModelSnapshot : ModelSnapshot
+    [Migration("20220804101646_Update-ViDictionary")]
+    partial class UpdateViDictionary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -443,8 +445,8 @@ namespace ToolSeoViet.Database.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsMeaning")
                         .HasColumnType("bit");

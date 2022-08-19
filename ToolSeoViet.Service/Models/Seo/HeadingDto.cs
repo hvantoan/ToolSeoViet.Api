@@ -14,6 +14,9 @@ namespace ToolSeoViet.Service.Models.Seo {
         public string Name { get; set; }
         public List<TitleDto> Titles { get; set; }
         public List<SubTitleDto> SubTitles { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+        public List<string> TotalSLI { get; set; }
     }
 
     public partial class HeadingDto {

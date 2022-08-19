@@ -11,12 +11,14 @@ namespace ToolSeoViet.Service.Utils {
         public Dictionary<string, ViDictionary> GetViDictionaries{
             get {
                 Dictionary<string, ViDictionary> dictionaries = new();
-                if (cache.TryGetValue("ObjDicLib", out dictionaries)) {
-                    return (Dictionary<string, ViDictionary>)cache.Get("ObjDicLib");
-                } else {
-                    dictionaries = viDictionaryService.All().ToDictionary(s => s.Id, s => s);
-                    cache.Set("ObjDicLib", dictionaries);
-                }
+                //if (false && cache.TryGetValue("ObjDicLib", out dictionaries)) {
+                //    return (Dictionary<string, ViDictionary>)cache.Get("ObjDicLib");
+                //} else {
+                //    dictionaries = viDictionaryService.All().ToDictionary(s => s.Word, s => s);
+                //    cache.Set("ObjDicLib", dictionaries);
+                //}
+                //TODO: Remove line below
+                dictionaries = viDictionaryService.All().ToDictionary(s => s.Word, s => s);
                 return dictionaries;
             }
         }
