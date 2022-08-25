@@ -18,7 +18,7 @@ namespace ToolSeoViet.Api.Controllers {
         }
 
         [HttpPost, Route("content")]
-        public async Task<BaseResponse> Login(SearchContentRequest request) {
+        public async Task<BaseResponse> SearchContents(SearchContentRequest request) {
             try {
                 var response = await this.seoService.GetContennt(request);
                 return BaseResponse<SearchContentDto>.Ok(response);
@@ -26,5 +26,16 @@ namespace ToolSeoViet.Api.Controllers {
                 return BaseResponse.Fail(ex.Message);
             }
         }
+
+        [HttpPost, Route("search-index")]
+        public async Task<BaseResponse> Index(SearchIndexRequest request) {
+            try {
+                var response = await this.seoService.Index(request);
+                return BaseResponse<SearchIndex>.Ok(response);
+            } catch (Exception ex) {
+                return BaseResponse.Fail(ex.Message);
+            }
+        }
     }
 }
+

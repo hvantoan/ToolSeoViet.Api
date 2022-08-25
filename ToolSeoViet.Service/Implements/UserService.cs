@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
 using ToolSeoViet.Services.Common;
-using ToolSeoViet.Services.Exceptions;
 using ToolSeoViet.Services.Hashers;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models.User;
 using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Services.Implements {
@@ -26,10 +26,10 @@ namespace ToolSeoViet.Services.Implements {
         public async Task ChangePassword(string oldPassword, string newPassword) {
             var user = await this.db.Users.FirstOrDefaultAsync(o => o.Id == this.currentUserId);
             if (user == null)
-                throw new UserException(Messages.User.ChangePassword.User_NotFound);
+                throw new ManagedException(Messages.User.ChangePassword.User_NotFound);
 
             if (!PasswordHashser.Verify(oldPassword, user.Password))
-                throw new UserException(Messages.User.ChangePassword.User_IncorrentOldPassword);
+                throw new ManagedException(Messages.User.ChangePassword.User_IncorrentOldPassword);
 
             user.Password = PasswordHashser.Hash(newPassword);
 
@@ -39,7 +39,7 @@ namespace ToolSeoViet.Services.Implements {
         public async Task ResetPassword(string userId, string password) {
             var user = await this.db.Users.FirstOrDefaultAsync(o => o.Id == userId);
             if (user == null)
-                throw new UserException(Messages.User.ResetPassword.User_NotFound);
+                throw new ManagedException(Messages.User.ResetPassword.User_NotFound);
 
             user.Password = PasswordHashser.Hash(password);
 
@@ -58,7 +58,7 @@ namespace ToolSeoViet.Services.Implements {
         private async Task<UserDto> Create(UserDto model) {
             var existed = await this.db.Users.AnyAsync(o =>o.Username == model.Username);
             if (existed)
-                throw new UserException(Messages.User.CreateOrUpdate.User_Existed);
+                throw new ManagedException(Messages.User.CreateOrUpdate.User_Existed);
 
             await this.Validate(model.RoleId);
 
@@ -81,16 +81,16 @@ namespace ToolSeoViet.Services.Implements {
         private async Task<UserDto> Update(UserDto model) {
             var existed = await this.db.Users.AnyAsync(o => o.Id != model.Id && o.Username == model.Username);
             if (existed)
-                throw new UserException(Messages.User.CreateOrUpdate.User_Existed);
+                throw new ManagedException(Messages.User.CreateOrUpdate.User_Existed);
 
             await this.Validate(model.RoleId);
 
             var user = await this.db.Users.FirstOrDefaultAsync(o => o.Id == model.Id);
             if (user == null)
-                throw new UserException(Messages.User.CreateOrUpdate.User_NotFound);
+                throw new ManagedException(Messages.User.CreateOrUpdate.User_NotFound);
 
             if (user.IsAdmin && !model.IsActive)
-                throw new UserException(Messages.User.CreateOrUpdate.User_NotInactive);
+                throw new ManagedException(Messages.User.CreateOrUpdate.User_NotInactive);
 
             user.Username = model.Username;
             user.RoleId = model.RoleId;
@@ -103,11 +103,11 @@ namespace ToolSeoViet.Services.Implements {
 
         private async Task Validate(string roleId) {
             if (string.IsNullOrWhiteSpace(roleId))
-                throw new UserException(Messages.User.CreateOrUpdate.Role_NotFound);
+                throw new ManagedException(Messages.User.CreateOrUpdate.Role_NotFound);
 
             var role = await this.db.Roles.FirstOrDefaultAsync(o => o.Id == roleId);
             if (role == null)
-                throw new UserException(Messages.User.CreateOrUpdate.Role_NotFound);
+                throw new ManagedException(Messages.User.CreateOrUpdate.Role_NotFound);
         }
     }
 }
