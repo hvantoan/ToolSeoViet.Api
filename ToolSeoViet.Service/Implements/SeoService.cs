@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -140,6 +141,43 @@ namespace ToolSeoViet.Service.Implements {
             };
         }
 
+        public async Task<SearchIndex> Index(SearchIndexRequest request) {
 
+            request.Key = request.Key.Replace("  ", " ").Replace(" ", "+");
+            string url = "https://www.google.com.vn" + "/search?q=" + request.Key + "&ie=utf-8&num=100";
+            string result = url.GetHtmlPage();
+
+            HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(result);
+            string divClass = configuration["SeoToolConfig:divCSS"];
+            string devDescription = configuration["SeoToolConfig:divDescription"];
+            var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
+
+            for (int i = 0; i < divList.Count; i++) {
+                var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
+                if (temp == null)
+                    continue;
+                var a = temp.Descendants("a").FirstOrDefault();
+                if (a == null)
+                    continue;
+                var h3 = temp.Descendants("h3").FirstOrDefault();
+                if (h3 == null)
+                    continue;
+
+                string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
+                string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o => !string.IsNullOrEmpty(o));
+                if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(heading)) continue;
+
+                if (href.IndexOf(request.Domain) >= 0) {
+                    return await Task.FromResult(new SearchIndex() {
+                        Href = href.GetHref(),
+                        Key = request.Key.Replace("+"," "),
+                        Name = heading,
+                        Position = i + 1
+                    });
+                }
+            }
+            return await Task.FromResult(new SearchIndex() {Key = request.Key});
+        }
     }
 }
