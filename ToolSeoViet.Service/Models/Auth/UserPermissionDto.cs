@@ -25,7 +25,7 @@ namespace ToolSeoViet.Services.Models.Auth {
         }
 
         private static List<UserPermissionDto> GetUserPermissions(List<ToolSeoViet.Database.Models.Permission> permissions,
-            bool isAdmin, string parentId = null) {
+            bool isAdmin, string parentId = "") {
             var permissionDtos = permissions.Where(o => o.IsActive && o.ParentId == parentId).Select(o => new UserPermissionDto {
                 Id = o.Id,
                 ClaimName = o.ClaimName,

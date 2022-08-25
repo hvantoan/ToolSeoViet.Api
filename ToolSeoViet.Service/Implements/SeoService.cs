@@ -146,6 +146,7 @@ namespace ToolSeoViet.Service.Implements {
         }
 
         public async Task<List<string>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
+            dictionaries = cacheManager.GetViDictionaries;
             Dictionary<string, int> wordDic = new Dictionary<string, int>();
             for (int i = 0; i < wordsList.Count; i++) {
                 List<string> strTemp = wordsList[i].Split(new string[] { " ", "," }, StringSplitOptions.None).ToList();
