@@ -8,5 +8,6 @@ using ToolSeoViet.Service.Models.Seo;
 namespace ToolSeoViet.Service.Interfaces {
     public interface ISeoService {
         Task<SearchContentDto> GetContennt(SearchContentRequest request);
+        Task<SearchIndex> Index(SearchIndexRequest request);
     }
 }

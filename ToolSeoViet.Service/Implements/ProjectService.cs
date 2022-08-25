@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
-using ToolSeoViet.Service.Exceptions;
 using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.KeyWord;
 using ToolSeoViet.Service.Models.Project;
 using ToolSeoViet.Services.Common;
 using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Service.Implements
@@ -28,7 +28,7 @@ namespace ToolSeoViet.Service.Implements
         {
 
             var data = await db.Projects.AsNoTracking().Include(k => k.KeyWords).FirstOrDefaultAsync(o => o.UserId == request.Id);
-            if (data == null) throw new ProjectException(Messages.Project.CheckProject.Project_NotFound);
+            if (data == null) throw new ManagedException(Messages.Project.CheckProject.Project_NotFound);
 
             var response = new ProjectDto()
             {

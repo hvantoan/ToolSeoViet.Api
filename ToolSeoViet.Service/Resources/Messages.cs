@@ -64,6 +64,9 @@
             public const string SearchContent_NotFound = "Nội dung không tồn tại.";
 
         }
+        public static class SearchIndex {
+            public const string Index_KeyNotEmpty = "Từ khóa không được để trống.";
+        }
 
     }
 }

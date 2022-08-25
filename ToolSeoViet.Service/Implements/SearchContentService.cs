@@ -7,12 +7,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
-using ToolSeoViet.Service.Exceptions;
 using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.SearchContent;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Services.Common;
 using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Service.Implements {
@@ -25,21 +25,21 @@ namespace ToolSeoViet.Service.Implements {
             /// Không có nội dung xuất ra message
             List<SearchContent> searchContents = this.db.SearchContents.AsNoTracking().Where(o => o.UserId == this.currentUserId).OrderByDescending(o => o.DateCreated).ToList();
 
-            if (searchContents == null) throw new SearchContentException(Messages.SearchContent.SearchContent_IsEmpty);
+            if (searchContents == null) throw new ManagedException(Messages.SearchContent.SearchContent_IsEmpty);
 
             List<SearchContentDto> searchContentsDto = new();
 
             foreach (var item in searchContents) searchContentsDto.Add(SearchContentDto.FromEntity(item));
 
             return await Task.FromResult(new ListSearchContentResponse() {
-                Count = searchContentsDto.Count(),
+                Count = searchContentsDto.Count,
                 Items = searchContentsDto
             });
         }
         public async Task<SearchContentDto> Get(GetSearchContent request) {
             var data = this.db.SearchContents.AsNoTracking().Where(o => o.Id == request.Id && o.UserId == currentUserId).FirstOrDefault();
-            if (data == null) throw new SearchContentException(Messages.SearchContent.SearchContent_NotFound);
-            if (data == null) throw new SearchContentException(Messages.SearchContent.SearchContent_NotFound);
+            if (data == null) throw new ManagedException(Messages.SearchContent.SearchContent_NotFound);
+            if (data == null) throw new ManagedException(Messages.SearchContent.SearchContent_NotFound);
             var headings =  this.db.Headings.Include(o => o.Titles).Include(o => o.SubTitles).AsNoTracking().Where(o => o.SearchContentId == data.Id);
             return await Task.FromResult(new SearchContentDto() {
                 DateCreated = data.DateCreated,

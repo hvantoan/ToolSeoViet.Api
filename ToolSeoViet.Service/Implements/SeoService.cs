@@ -1,11 +1,15 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
@@ -14,6 +18,8 @@ using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Service.Utils;
 using ToolSeoViet.Services.Common;
+using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Service.Implements {

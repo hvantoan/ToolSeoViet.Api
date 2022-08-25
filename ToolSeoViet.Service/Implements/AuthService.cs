@@ -15,11 +15,11 @@ using ToolSeoViet.Database;
 using ToolSeoViet.Database.Enums;
 using ToolSeoViet.Database.Models;
 using ToolSeoViet.Services.Common;
-using ToolSeoViet.Services.Exceptions;
 using ToolSeoViet.Services.Hashers;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models.Auth;
 using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 
 namespace ToolSeoViet.Services.Implements {
@@ -37,11 +37,11 @@ namespace ToolSeoViet.Services.Implements {
 
             var user = await this.db.Users.AsNoTracking().FirstOrDefaultAsync(o => o.Username == request.Username.ToLower().Trim());
             if (user == null)
-                throw new UserException(Messages.Auth.Login.User_NotFound);
+                throw new ManagedException(Messages.Auth.Login.User_NotFound);
             if (!user.IsAdmin && !user.IsActive)
-                throw new UserException(Messages.Auth.Login.User_Inactive);
+                throw new ManagedException(Messages.Auth.Login.User_Inactive);
             if (!PasswordHashser.Verify(request.Password, user.Password))
-                throw new UserException(Messages.Auth.Login.User_IncorrectPassword);
+                throw new ManagedException(Messages.Auth.Login.User_IncorrectPassword);
 
             var permissions = await this.db.Permisstions.Where(o => o.Type == EPermission.Web).AsNoTracking().ToListAsync();
             Role role = null;
@@ -64,8 +64,6 @@ namespace ToolSeoViet.Services.Implements {
 
         public async Task<LoginResponse> WebLoginGoogle(LoginGoogleRequest request) {
             var permissions = await this.db.Permisstions.Where(o => o.Type == EPermission.Web).AsNoTracking().ToListAsync();
-            
-
             string url = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + request.ExternalToken;
             using (HttpClient client = new()) {
                 client.BaseAddress = new Uri(url);
@@ -77,7 +75,7 @@ namespace ToolSeoViet.Services.Implements {
                         var data = await response.Content.ReadAsStringAsync();
                         GoolgeUserInforModel googleObj = Newtonsoft.Json.JsonConvert.DeserializeObject<GoolgeUserInforModel>(data) ?? new GoolgeUserInforModel() { Id = "" };
                         if (request.ExternalId != googleObj.Id) {
-                            throw new UserException(Messages.Auth.Login.User_NotFound);
+                            throw new ManagedException(Messages.Auth.Login.User_NotFound);
                         }
                     }
                 } catch (Exception ex) {
@@ -105,9 +103,9 @@ namespace ToolSeoViet.Services.Implements {
             User user = this.db.Users.FirstOrDefault(o => o.Username == request.Email) ?? new User() { Id=""};
 
             if (user == null)
-                throw new UserException(Messages.Auth.Login.User_NotFound);
+                throw new ManagedException(Messages.Auth.Login.User_NotFound);
             if (!user.IsAdmin && !user.IsActive)
-                throw new UserException(Messages.Auth.Login.User_Inactive);
+                throw new ManagedException(Messages.Auth.Login.User_Inactive);
 
             Role role = null;
             if (!string.IsNullOrWhiteSpace(user.RoleId) && !string.IsNullOrEmpty(user.RoleId) ){
