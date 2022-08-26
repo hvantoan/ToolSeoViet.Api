@@ -4,8 +4,12 @@
         public string Num { get; set; }
     }
 
-    public partial class SearchIndexRequest {
+    public partial class SearchPositionRequest {
         public string Key { get; set; }
         public string Domain { get; set; }
+    }
+
+    public partial class SearchIndexRequest {
+        public string Href { get; set; }
     }
 }

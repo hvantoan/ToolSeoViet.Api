@@ -6,7 +6,6 @@ using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models;
-using ToolSeoViet.Services.Models.Auth;
 
 namespace ToolSeoViet.Api.Controllers {
     [ApiController, Authorize, Route("api/seo/")]
@@ -27,7 +26,17 @@ namespace ToolSeoViet.Api.Controllers {
             }
         }
 
-        [HttpPost, Route("search-index")]
+        [HttpPost, Route("position")]
+        public async Task<BaseResponse> Position(SearchPositionRequest request) {
+            try {
+                var response = await this.seoService.Position(request);
+                return BaseResponse<SearchPosition>.Ok(response);
+            } catch (Exception ex) {
+                return BaseResponse.Fail(ex.Message);
+            }
+        }
+
+        [HttpPost, Route("index")]
         public async Task<BaseResponse> Index(SearchIndexRequest request) {
             try {
                 var response = await this.seoService.Index(request);

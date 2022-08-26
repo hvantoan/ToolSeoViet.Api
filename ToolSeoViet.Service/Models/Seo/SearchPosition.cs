@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static ToolSeoViet.Service.Enums;
 
 namespace ToolSeoViet.Service.Models.Seo {
-    public partial class SearchIndex {
+    public partial class SearchPosition {
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public int Position { get; set; }
         public string Href { get; set; }
-        public ECheckIndex Status { get; set; }
     }
 }

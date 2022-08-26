@@ -22,6 +22,7 @@ using ToolSeoViet.Services.Common;
 using ToolSeoViet.Services.Resources;
 using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
+using static ToolSeoViet.Service.Enums;
 
 namespace ToolSeoViet.Service.Implements {
     public class SeoService : BaseService, ISeoService {
@@ -141,7 +142,7 @@ namespace ToolSeoViet.Service.Implements {
             };
         }
 
-        public async Task<SearchIndex> Index(SearchIndexRequest request) {
+        public async Task<SearchPosition> Position(SearchPositionRequest request) {
 
             request.Key = request.Key.Replace("  ", " ").Replace(" ", "+");
             string url = "https://www.google.com.vn" + "/search?q=" + request.Key + "&ie=utf-8&num=100";
@@ -169,15 +170,49 @@ namespace ToolSeoViet.Service.Implements {
                 if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(heading)) continue;
 
                 if (href.IndexOf(request.Domain) >= 0) {
-                    return await Task.FromResult(new SearchIndex() {
+                    return await Task.FromResult(new SearchPosition() {
                         Href = href.GetHref(),
-                        Key = request.Key.Replace("+"," "),
+                        Key = request.Key.Replace("+", " "),
                         Name = heading,
                         Position = i + 1
                     });
                 }
             }
-            return await Task.FromResult(new SearchIndex() {Key = request.Key});
+            return await Task.FromResult(new SearchPosition() { Key = request.Key });
+        }
+
+        public async Task<SearchIndex> Index(SearchIndexRequest request) {
+            string url = $"https://www.google.com/search?q=site:{request.Href}&ie=UTF-8&num=10";
+            string result = url.GetHtmlPage();
+
+            HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(result);
+            string divClass = configuration["SeoToolConfig:divCSS"];
+            string devDescription = configuration["SeoToolConfig:divDescription"];
+            var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
+
+            for (int i = 0; i < divList.Count; i++) {
+                var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
+                if (temp == null)
+                    continue;
+                var a = temp.Descendants("a").FirstOrDefault();
+                if (a == null)
+                    continue;
+
+                string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
+                if (string.IsNullOrEmpty(href)) continue;
+
+                if (href.IndexOf(request.Href) >= 0) {
+                    return await Task.FromResult(new SearchIndex() {
+                        Href = href.GetHref(),
+                        Status = ECheckIndex.Done
+                    });
+                }
+            }
+            return await Task.FromResult(new SearchIndex() { 
+                Href = request.Href,
+                Status = ECheckIndex.None
+            });
         }
     }
 }
