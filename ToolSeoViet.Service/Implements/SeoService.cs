@@ -190,25 +190,31 @@ namespace ToolSeoViet.Service.Implements {
             string divClass = configuration["SeoToolConfig:divCSS"];
             string devDescription = configuration["SeoToolConfig:divDescription"];
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
+            if (divList != null)
+            {
+                for (int i = 0; i < divList.Count; i++)
+                {
+                    var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
+                    if (temp == null)
+                        continue;
+                    var a = temp.Descendants("a").FirstOrDefault();
+                    if (a == null)
+                        continue;
 
-            for (int i = 0; i < divList.Count; i++) {
-                var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
-                if (temp == null)
-                    continue;
-                var a = temp.Descendants("a").FirstOrDefault();
-                if (a == null)
-                    continue;
+                    string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
+                    if (string.IsNullOrEmpty(href)) continue;
 
-                string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
-                if (string.IsNullOrEmpty(href)) continue;
-
-                if (href.IndexOf(request.Href) >= 0) {
-                    return await Task.FromResult(new SearchIndex() {
-                        Href = href.GetHref(),
-                        Status = ECheckIndex.Done
-                    });
+                    if (href.IndexOf(request.Href) >= 0)
+                    {
+                        return await Task.FromResult(new SearchIndex()
+                        {
+                            Href = href.GetHref(),
+                            Status = ECheckIndex.Done
+                        });
+                    }
                 }
             }
+            
             return await Task.FromResult(new SearchIndex() { 
                 Href = request.Href,
                 Status = ECheckIndex.None
