@@ -182,7 +182,7 @@ namespace ToolSeoViet.Service.Implements {
         }
 
         public async Task<SearchIndex> Index(SearchIndexRequest request) {
-            string url = $"https://www.google.com/search?q=site:{request.Href}&ie=UTF-8&num=10";
+            string url = $"https://www.google.com/search?q=site:{request.Href}&oq=site&sourceid=chrome&ie=UTF-8";
             string result = url.GetHtmlPage();
 
             HtmlDocument htmlDocument = new();
