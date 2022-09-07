@@ -99,14 +99,22 @@ namespace ToolSeoViet.Service.Implements {
                 return new HeadingDto() {
                     Href = url.GetHref(),
                     Name = h1,
-                    Titles = new List<TitleDto>(),
                     Position = position,
-                    SubTitles = new List<SubTitleDto>(),
                     Id = Guid.NewGuid().ToStringN()
                 };
             }
 
             htmlDocument.LoadHtml(htmlDetail);
+            var body = htmlDocument.DocumentNode.SelectSingleNode("//body");
+            if (body == null) return new HeadingDto() {
+                Href = url.GetHref(),
+                Name = h1,
+                Position = position,
+                Id = Guid.NewGuid().ToStringN()
+            };
+            List<string> wordList = body.Get
+            var totalSLI = GetSLI()
+
             var h2 = htmlDocument.DocumentNode.SelectNodes("//body//h2");
             var h3 = htmlDocument.DocumentNode.SelectNodes("//body//h3");
             var titles = new List<Title>();
