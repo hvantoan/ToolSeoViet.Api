@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,7 @@ namespace ToolSeoViet.Service.Implements {
         public async Task<SearchContentDto> GetContennt(SearchContentRequest request) {
 
             request.KeyWord = request.KeyWord.Replace("  ", " ").Replace(" ", "+");
-            string url = "https://www.google.com.vn" + "/search?q=" + request.KeyWord + "&ie=utf-8&num=" + request.Num;
+            string url = $"https://www.google.com.vn/search?q={request.KeyWord}&num={request.Num}&start=0&ie=utf-8&oe=utf-8&pws=0&hl=vi";
             string result = url.GetHtmlPage();
 
 
@@ -73,15 +74,33 @@ namespace ToolSeoViet.Service.Implements {
                 taskList.Add(taskTemp);
             }
             await Task.WhenAll(taskList);
+
+            List<SearchSLIKey> total = new();
             List<HeadingDto> headings = new();
             for (int i = 0; i < taskList.Count; i++) {
                 HeadingDto temp = ((Task<HeadingDto>)taskList[i]).Result;
                 headings.Add(temp);
-            }
+                var keys = total.Select(o => o.KeyWord).ToList();
+                
+                List<SearchSLIKey> keyWordExisted;
+                List<SearchSLIKey> keyWordNotExisted;
 
+                keyWordExisted = temp.SLI?.Where(o => keys.Contains(o.KeyWord ?? ""))?.ToList() ?? new List<SearchSLIKey>();
+                keyWordNotExisted = temp.SLI?.Where(o => !keys.Contains(o.KeyWord ?? ""))?.ToList() ?? new List<SearchSLIKey>();
+                foreach (var item in keyWordExisted) {
+                    var data = total.FirstOrDefault(o => o.KeyWord == item.KeyWord);
+                    if (data == null) continue;
+                    data.Count += item.Count;
+                }
+                if (keyWordNotExisted.Any()) {
+                    total = total.Union(keyWordNotExisted).ToList();
+                }
+
+            }
             var searchContent = new SearchContentDto() {
                 DateCreated = DateTimeOffset.Now,
                 Headings = headings ?? new List<HeadingDto>(),
+                SLI = total.Any() ? total.OrderByDescending(o=>o.Count).Take(50).ToList() : null,
                 Name = request.KeyWord.Replace("+", " ")
             };
             await searchContentService.Save(searchContent);
@@ -110,11 +129,11 @@ namespace ToolSeoViet.Service.Implements {
                 Position = position,
                 Id = Guid.NewGuid().ToStringN()
             };
-            
+
             var h2 = body.SelectNodes("//h2");
             var h3 = body.SelectNodes("//h3");
-            var titles = new List<Title>();
-            var subTitles = new List<SubTitle>();
+            List<Title> titles = new();
+            List<SubTitle> subTitles = new();
 
             if (h2 != null) {
                 foreach (var item1 in h2) {
@@ -138,14 +157,14 @@ namespace ToolSeoViet.Service.Implements {
             }
             List<string> words = body.GetBodyStr();
             var totalSLI = await GetSLI(words, dictionaries);
-            
+
             return new() {
                 Name = h1,
                 Href = url,
-                SLI = totalSLI ?? new(),
+                SLI = totalSLI,
                 Position = position,
-                SubTitles = subTitles?.Select(o => SubTitleDto.FromEntity(o)).ToList(),
-                Titles = titles?.Select(o => TitleDto.FromEntity(o)).ToList(),
+                SubTitles = subTitles.Any() ? subTitles.Select(o => SubTitleDto.FromEntity(o)).ToList() : null,
+                Titles = titles.Any() ? titles.Select(o => TitleDto.FromEntity(o)).ToList() : null,
             };
         }
 
@@ -170,7 +189,6 @@ namespace ToolSeoViet.Service.Implements {
                 if (!dictionaries[key.KeyWord.Trim().ToLower()].IsMeaning) continue;
                 if (key.Count > 2) result.Add(key);
             }
-            result = result.Take(50).ToList();
             return await Task.FromResult(result);
         }
 
@@ -222,10 +240,8 @@ namespace ToolSeoViet.Service.Implements {
             string divClass = configuration["SeoToolConfig:divCSS"];
             string devDescription = configuration["SeoToolConfig:divDescription"];
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
-            if (divList != null)
-            {
-                for (int i = 0; i < divList.Count; i++)
-                {
+            if (divList != null) {
+                for (int i = 0; i < divList.Count; i++) {
                     var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
                     if (temp == null)
                         continue;
@@ -236,18 +252,16 @@ namespace ToolSeoViet.Service.Implements {
                     string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
                     if (string.IsNullOrEmpty(href)) continue;
 
-                    if (href.IndexOf(request.Href) >= 0)
-                    {
-                        return await Task.FromResult(new SearchIndex()
-                        {
+                    if (href.IndexOf(request.Href) >= 0) {
+                        return await Task.FromResult(new SearchIndex() {
                             Href = href.GetHref(),
                             Status = ECheckIndex.Done
                         });
                     }
                 }
             }
-            
-            return await Task.FromResult(new SearchIndex() { 
+
+            return await Task.FromResult(new SearchIndex() {
                 Href = request.Href,
                 Status = ECheckIndex.None
             });

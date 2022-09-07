@@ -12,8 +12,11 @@ namespace ToolSeoViet.Service.Models.Seo {
         public string Href { get; set; }
         public int Position { get; set; }
         public string Name { get; set; }
+        [JsonIgnore]
         public List<SearchSLIKey> SLI { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
         public List<TitleDto> Titles { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
         public List<SubTitleDto> SubTitles { get; set; }
     }
 
