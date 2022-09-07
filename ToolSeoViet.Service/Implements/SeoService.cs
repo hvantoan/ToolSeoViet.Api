@@ -142,6 +142,56 @@ namespace ToolSeoViet.Service.Implements {
             };
         }
 
+        public async Task<List<string>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
+            dictionaries = cacheManager.GetViDictionaries;
+            Dictionary<string, int> wordDic = new Dictionary<string, int>();
+            for (int i = 0; i < wordsList.Count; i++) {
+                List<string> strTemp = wordsList[i].Split(new string[] { " ", "," }, StringSplitOptions.None).ToList();
+                for (int j = 0; j < strTemp.Count - 1; j++) {
+                    string str = strTemp[j].getStr() + " " + strTemp[j + 1].getStr();
+                    if (wordDic.ContainsKey(str)) {
+                        wordDic[str]++;
+                    } else {
+                        wordDic.Add(str, 1);
+                    }
+                }
+            }
+            List<string> listTemp = new List<string>();
+            List<SearchSLIKey> keyModelList = wordDic.Select(s => new SearchSLIKey { Count = s.Value, KeyWord = s.Key }).OrderByDescending(s => s.Count).ToList();
+
+            List<Task> tasks = new();
+            for (int i = 0; i < keyModelList.Count; i++) {
+                if (dictionaries.ContainsKey(keyModelList[i].KeyWord.Trim())) {
+                    if (dictionaries[keyModelList[i].KeyWord.Trim().ToLower()].IsMeaning != true) {
+                        continue;
+                    }
+                    totalSLI.Add(keyModelList[i].KeyWord);
+                    if (i < 50 || keyModelList[i].Count > 2)
+                        listTemp.Add(keyModelList[i].KeyAndCount);
+                } else {
+
+                    Task<ViDictionary> tmp = Task.Run(() => SearchDictionary(keyModelList[i].KeyWord.Trim()));
+                    tasks.Add(tmp);
+
+                    //if (await SearchDictionary(keyModelList[i].KeyWord.Trim())) {
+                    //    //totalSLI.Add(keyModelList[i].KeyWord);
+                    //    //if (i < 50 || keyModelList[i].Count > 2)
+                    //    //    listTemp.Add(keyModelList[i].KeyAndCount);
+                    //}
+
+                }
+                Task.Delay(100).Wait();
+            }
+            await Task.WhenAll(tasks);
+
+            for (int i = 0; i < tasks.Count; i++) {
+                ViDictionary temp = ((Task<ViDictionary>)tasks[i]).Result;
+                await viDictionaryService.InsertKeyWord(temp);
+            }
+
+            return listTemp;
+        }
+
         public async Task<SearchPosition> Position(SearchPositionRequest request) {
 
             request.Key = request.Key.Replace("  ", " ").Replace(" ", "+");
