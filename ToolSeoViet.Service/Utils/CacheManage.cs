@@ -14,7 +14,7 @@ namespace ToolSeoViet.Service.Utils {
                 if (cache.TryGetValue("ObjDicLib", out dictionaries)) {
                     return (Dictionary<string, ViDictionary>)cache.Get("ObjDicLib");
                 } else {
-                    dictionaries = viDictionaryService.All().ToDictionary(s => s.Id, s => s);
+                    dictionaries = viDictionaryService.All().ToDictionary(s => s.Word, s => s);
                     cache.Set("ObjDicLib", dictionaries);
                 }
                 return dictionaries;

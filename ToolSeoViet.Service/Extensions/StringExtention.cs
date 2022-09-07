@@ -1,7 +1,9 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace ToolSeoViet.Service.Extensions {
@@ -94,6 +96,64 @@ namespace ToolSeoViet.Service.Extensions {
             } catch (Exception) {
                 return "";
             }
+        }
+        public static List<string> GetBodyStr(this HtmlNode body) {
+            foreach (var script in body.Descendants("script").ToArray())
+                script.Remove();
+            foreach (var item in body.Descendants("style").ToArray())
+                item.Remove();
+            foreach (var item in body.Descendants("iframe").ToArray())
+                item.Remove();
+            foreach (var item in body.Descendants("Iframe").ToArray())
+                item.Remove();
+            foreach (var item in body.Descendants("video").ToArray())
+                item.Remove();
+            foreach (var item in body.Descendants("videoitem").ToArray())
+                item.Remove();
+
+            List<string> strList = new List<string>();
+            var temp = body.DescendantNodesAndSelf().ToList();
+
+            for (int i = 0; i < temp.Count; i++) {
+                if (!temp[i].HasChildNodes) {
+                    string text = WebUtility.HtmlDecode(temp[i].InnerText);
+                    if (!string.IsNullOrEmpty(text)) {
+                        StringBuilder sb = new StringBuilder(text.Trim());
+                        sb.Replace("\n\n", "\n");
+                        sb.Replace("\t\t", "\t");
+                        sb.Replace("\r\r", "\r");
+                        sb.Replace("-", "");
+                        sb.Replace("–", "");
+                        sb.Replace("\"", "");
+                        sb.Replace("'", "");
+                        sb.Replace(">", "");
+                        sb.Replace("<", "");
+                        sb.Replace("!", "");
+                        sb.Replace("#", "");
+                        sb.Replace("”", "");
+                        sb.Replace("*", "");
+                        sb.Replace("*", "");
+                        sb.Replace("…", "");
+                        text = sb.ToString();
+                        if (text == "\n" || text == "\n\n" || text == "\n\t" || text == "\n\r" || text == "\r" || text == "\t" || text == ""
+                            || text == "." || text == "," || text == "|" ||
+                            text.StartsWith("{\""))
+                            continue;
+
+                        string[] M = text.Split(new string[] { ".", ",", "?", ":", "-", "–", "", "\\", "/", "&", "(", ")", "[", "]", "'", "+", "...", "_" }, StringSplitOptions.None);
+                        for (int h = 0; h < M.Length; h++) {
+                            if (M[h].All(char.IsDigit)) {
+                                continue;
+                            }
+                            string strTemp = M[h].Trim();
+                            if (!string.IsNullOrEmpty(strTemp))
+                                strList.Add(M[h].Trim());
+                        }
+
+                    }
+                }
+            }
+            return strList;
         }
     }
 }

@@ -76,6 +76,7 @@ namespace ToolSeoViet.Service.Implements {
             }
         }
         public void SaveTitle(List<TitleDto> titles, string headingId) {
+            if (titles == null) return;
             var mTitles = titles.Select(o => new Title() {
                 Id = Guid.NewGuid().ToStringN(),
                 HeadingId = headingId,
@@ -85,6 +86,7 @@ namespace ToolSeoViet.Service.Implements {
             foreach (var title in mTitles) this.db.Titles.Add(title);
         }
         public void SaveSubTitle(List<SubTitleDto> subTitles, string headingId) {
+            if (subTitles == null) return;
             var mSubTitles = subTitles.Select(o => new SubTitle() {
                 Id = Guid.NewGuid().ToStringN(),
                 HeadingId = headingId,

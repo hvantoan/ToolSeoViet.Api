@@ -73,8 +73,6 @@ namespace ToolSeoViet.Service.Implements {
                 taskList.Add(taskTemp);
             }
             await Task.WhenAll(taskList);
-            string path = System.IO.Directory.GetCurrentDirectory();
-
             List<HeadingDto> headings = new();
             for (int i = 0; i < taskList.Count; i++) {
                 HeadingDto temp = ((Task<HeadingDto>)taskList[i]).Result;
@@ -91,7 +89,7 @@ namespace ToolSeoViet.Service.Implements {
             return searchContent;
         }
 
-        public static HeadingDto GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries) {
+        public async Task<HeadingDto> GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries) {
 
             HtmlDocument htmlDocument = new();
             string htmlDetail = url.GetHtmlDetail();
@@ -112,11 +110,9 @@ namespace ToolSeoViet.Service.Implements {
                 Position = position,
                 Id = Guid.NewGuid().ToStringN()
             };
-            List<string> wordList = body.Get
-            var totalSLI = GetSLI()
-
-            var h2 = htmlDocument.DocumentNode.SelectNodes("//body//h2");
-            var h3 = htmlDocument.DocumentNode.SelectNodes("//body//h3");
+            
+            var h2 = body.SelectNodes("//h2");
+            var h3 = body.SelectNodes("//h3");
             var titles = new List<Title>();
             var subTitles = new List<SubTitle>();
 
@@ -140,16 +136,20 @@ namespace ToolSeoViet.Service.Implements {
                     }
                 }
             }
+            List<string> words = body.GetBodyStr();
+            var totalSLI = await GetSLI(words, dictionaries);
+            
             return new() {
                 Name = h1,
                 Href = url,
+                SLI = totalSLI ?? new(),
                 Position = position,
-                SubTitles = subTitles?.Select(o => SubTitleDto.FromEntity(o)).ToList() ?? new List<SubTitleDto>(),
-                Titles = titles?.Select(o => TitleDto.FromEntity(o)).ToList() ?? new List<TitleDto>(),
+                SubTitles = subTitles?.Select(o => SubTitleDto.FromEntity(o)).ToList(),
+                Titles = titles?.Select(o => TitleDto.FromEntity(o)).ToList(),
             };
         }
 
-        public async Task<List<string>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
+        public async Task<List<SearchSLIKey>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries) {
             Dictionary<string, int> wordDic = new();
             for (int i = 0; i < wordsList.Count; i++) {
                 List<string> strTemp = wordsList[i].Split(new string[] { " ", "," }, StringSplitOptions.None).ToList();
@@ -162,20 +162,16 @@ namespace ToolSeoViet.Service.Implements {
                     }
                 }
             }
-            List<string> tmp = new();
-            List<SearchSLIKey> keyModelList = wordDic.Select(s => new SearchSLIKey { Count = s.Value, KeyWord = s.Key }).OrderByDescending(s => s.Count).ToList();
+            List<SearchSLIKey> result = new();
+            List<SearchSLIKey> keys = wordDic.Select(s => new SearchSLIKey { Count = s.Value, KeyWord = s.Key }).OrderByDescending(s => s.Count).ToList();
 
-            for (int i = 0; i < keyModelList.Count; i++) {
-                if (!dictionaries.ContainsKey(keyModelList[i].KeyWord.Trim())) continue;
-                if (dictionaries[keyModelList[i].KeyWord.Trim().ToLower()].IsMeaning != true) continue;
-                
-                totalSLI.Add(keyModelList[i].KeyWord);
-                if (i < 50 || keyModelList[i].Count > 2)
-                    tmp.Add(keyModelList[i].KeyAndCount);
+            foreach (var key in keys) {
+                if (!dictionaries.ContainsKey(key.KeyWord.Trim())) continue;
+                if (!dictionaries[key.KeyWord.Trim().ToLower()].IsMeaning) continue;
+                if (key.Count > 2) result.Add(key);
             }
-
-
-            return await Task.FromResult(tmp);
+            result = result.Take(50).ToList();
+            return await Task.FromResult(result);
         }
 
         public async Task<SearchPosition> Position(SearchPositionRequest request) {
