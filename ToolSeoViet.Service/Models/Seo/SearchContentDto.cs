@@ -6,6 +6,7 @@ namespace ToolSeoViet.Service.Models.Seo {
     public partial class SearchContentDto {
         public string Id { get; set; }
         public string Name { get; set; }
+        public List<SearchSLIKey> SLI { get; set; }
         public DateTimeOffset DateCreated { get; set; }
         public List<HeadingDto> Headings { get; set; }
     }
@@ -19,7 +20,7 @@ namespace ToolSeoViet.Service.Models.Seo {
                 Id = entity.Id,
                 Name = entity.Name,
                 DateCreated = entity.DateCreated,
-                Headings = headings?.Select(o=> HeadingDto.FromEntity(o)).ToList(),
+                Headings = headings?.Select(o => HeadingDto.FromEntity(o)).ToList(),
             };
         }
     }

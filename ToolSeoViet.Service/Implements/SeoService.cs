@@ -52,7 +52,6 @@ namespace ToolSeoViet.Service.Implements {
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
             List<Task> taskList = new();
             Dictionary<string, ViDictionary> dictionaries = cacheManager.GetViDictionaries;
-            List<string> totalSLI = new();
             for (int i = 0; i < divList.Count; i++) {
                 var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
                 if (temp == null)
@@ -69,7 +68,7 @@ namespace ToolSeoViet.Service.Implements {
                 string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o => !string.IsNullOrEmpty(o));
                 int index = i + 1;
                 Task<HeadingDto> taskTemp = Task.Run(() => {
-                    return GetScraping(href.GetHref(), index, heading, dictionaries, totalSLI);
+                    return GetScraping(href.GetHref(), index, heading, dictionaries);
                 });
                 taskList.Add(taskTemp);
             }
@@ -92,7 +91,7 @@ namespace ToolSeoViet.Service.Implements {
             return searchContent;
         }
 
-        public static HeadingDto GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
+        public static HeadingDto GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries) {
 
             HtmlDocument htmlDocument = new();
             string htmlDetail = url.GetHtmlDetail();
@@ -143,8 +142,7 @@ namespace ToolSeoViet.Service.Implements {
         }
 
         public async Task<List<string>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries, List<string> totalSLI) {
-            dictionaries = cacheManager.GetViDictionaries;
-            Dictionary<string, int> wordDic = new Dictionary<string, int>();
+            Dictionary<string, int> wordDic = new();
             for (int i = 0; i < wordsList.Count; i++) {
                 List<string> strTemp = wordsList[i].Split(new string[] { " ", "," }, StringSplitOptions.None).ToList();
                 for (int j = 0; j < strTemp.Count - 1; j++) {
@@ -156,40 +154,20 @@ namespace ToolSeoViet.Service.Implements {
                     }
                 }
             }
-            List<string> listTemp = new List<string>();
+            List<string> tmp = new();
             List<SearchSLIKey> keyModelList = wordDic.Select(s => new SearchSLIKey { Count = s.Value, KeyWord = s.Key }).OrderByDescending(s => s.Count).ToList();
 
-            List<Task> tasks = new();
             for (int i = 0; i < keyModelList.Count; i++) {
-                if (dictionaries.ContainsKey(keyModelList[i].KeyWord.Trim())) {
-                    if (dictionaries[keyModelList[i].KeyWord.Trim().ToLower()].IsMeaning != true) {
-                        continue;
-                    }
-                    totalSLI.Add(keyModelList[i].KeyWord);
-                    if (i < 50 || keyModelList[i].Count > 2)
-                        listTemp.Add(keyModelList[i].KeyAndCount);
-                } else {
-
-                    Task<ViDictionary> tmp = Task.Run(() => SearchDictionary(keyModelList[i].KeyWord.Trim()));
-                    tasks.Add(tmp);
-
-                    //if (await SearchDictionary(keyModelList[i].KeyWord.Trim())) {
-                    //    //totalSLI.Add(keyModelList[i].KeyWord);
-                    //    //if (i < 50 || keyModelList[i].Count > 2)
-                    //    //    listTemp.Add(keyModelList[i].KeyAndCount);
-                    //}
-
-                }
-                Task.Delay(100).Wait();
-            }
-            await Task.WhenAll(tasks);
-
-            for (int i = 0; i < tasks.Count; i++) {
-                ViDictionary temp = ((Task<ViDictionary>)tasks[i]).Result;
-                await viDictionaryService.InsertKeyWord(temp);
+                if (!dictionaries.ContainsKey(keyModelList[i].KeyWord.Trim())) continue;
+                if (dictionaries[keyModelList[i].KeyWord.Trim().ToLower()].IsMeaning != true) continue;
+                
+                totalSLI.Add(keyModelList[i].KeyWord);
+                if (i < 50 || keyModelList[i].Count > 2)
+                    tmp.Add(keyModelList[i].KeyAndCount);
             }
 
-            return listTemp;
+
+            return await Task.FromResult(tmp);
         }
 
         public async Task<SearchPosition> Position(SearchPositionRequest request) {

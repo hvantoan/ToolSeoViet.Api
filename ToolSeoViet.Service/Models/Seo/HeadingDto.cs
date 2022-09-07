@@ -12,6 +12,7 @@ namespace ToolSeoViet.Service.Models.Seo {
         public string Href { get; set; }
         public int Position { get; set; }
         public string Name { get; set; }
+        public List<SearchSLIKey> SLI { get; set; }
         public List<TitleDto> Titles { get; set; }
         public List<SubTitleDto> SubTitles { get; set; }
     }
@@ -28,8 +29,8 @@ namespace ToolSeoViet.Service.Models.Seo {
                 Name = entity.Name,
                 Href = entity.Href,
                 Position = entity.Position,
-                Titles = titles?.Select(o=> TitleDto.FromEntity(o)).ToList(),
-                SubTitles = subTitles?.Select(o=> SubTitleDto.FromEntity(o)).ToList(),
+                Titles = titles?.Select(o => TitleDto.FromEntity(o)).ToList(),
+                SubTitles = subTitles?.Select(o => SubTitleDto.FromEntity(o)).ToList(),
             };
         }
     }
