@@ -23,6 +23,10 @@ namespace ToolSeoViet.Service.Extensions {
             }
             return content;
         }
+        public static string getStr(this string str) {
+            string strTemp = (str.EndsWith("”") || str.EndsWith("\"") || str.EndsWith("?") || str.EndsWith(".") || str.EndsWith(":")) ? str.Substring(0, str.Length - 1) : str;
+            return strTemp.ToLower().Trim();
+        }
 
         public static string GetHtmlPage(this string strURL) {
             String strResult;
