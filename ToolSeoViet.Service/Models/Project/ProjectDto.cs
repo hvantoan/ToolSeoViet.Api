@@ -20,7 +20,7 @@ namespace ToolSeoViet.Service.Models.Project
     public partial class ProjectDto
     {
         public static ProjectDto FromEntity(ToolSeoViet.Database.Models.Project entity,
-            List<ToolSeoViet.Database.Models.KeyWord> keyWords = null)
+            List<ToolSeoViet.Database.Models.ProjectDetail> keyWords = null)
         {
             if (entity == null) return default;
 

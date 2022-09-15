@@ -18,11 +18,9 @@ namespace ToolSeoViet.Database {
         public DbSet<SLI> SLIs { get; set; }
         public DbSet<ViDictionary> ViDictionaries { get; set; }
 
-
-
         public DbSet<Project> Projects { get; set; }
 
-        public DbSet<KeyWord> KeyWords { get; set; }
+        public DbSet<ProjectDetail> ProjectDetails { get; set; }
 
         public ToolSeoVietContext() {
         }

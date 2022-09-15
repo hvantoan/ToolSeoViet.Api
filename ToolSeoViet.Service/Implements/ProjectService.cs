@@ -15,48 +15,37 @@ using ToolSeoViet.Services.Resources;
 using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 
-namespace ToolSeoViet.Service.Implements
-{
-    public class ProjectService : BaseService, IProjectService
-    {
-        public ProjectService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor)
-            : base(db, httpContextAccessor)
-        {
+namespace ToolSeoViet.Service.Implements {
+    public class ProjectService : BaseService, IProjectService {
+        public ProjectService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor) : base(db, httpContextAccessor) {
         }
-        /// Đầu vào là Id Project
-        public async Task<ProjectDto> Get(GetProjectRequest request)
-        {
-
-            var data = await db.Projects.AsNoTracking().Include(k => k.KeyWords).FirstOrDefaultAsync(o => o.UserId == request.Id);
-            if (data == null) throw new ManagedException(Messages.Project.CheckProject.Project_NotFound);
-
-            var response = new ProjectDto()
-            {
+        public async Task<GetProjectResponse> Get(string id) {
+            var data = await db.Projects.Include(k => k.ProjectDetails).AsNoTracking().FirstOrDefaultAsync(o => o.UserId == this.currentUserId &&  o.Id == id);
+            if (data == null) throw new ManagedException(Messages.Project.Get.Project_NotFound);
+            var response = new ProjectDto() {
                 Id = data.Id,
                 Domain = data.Domain,
                 Name = data.Name,
                 UserId = data.UserId,
-                KeyWords = data.KeyWords.Select(o => KeyWordDto.FromEntity(o)).ToList(),
+                KeyWords = data.ProjectDetails?.Select(o => KeyWordDto.FromEntity(o)).ToList(),
             };
-            return response;
+            return new() {
+                Data = response,
+                Success = true,
+                Message = "Lấy dữ liệu thành công."
+            };
         }
 
-        public async Task CreateOrUpdate(ProjectDto request)
-        {
+        public async Task CreateOrUpdate(ProjectDto request) {
             var isExiting = await db.Projects.AnyAsync(o => o.Id == request.Id);
-            if (!isExiting)
-            {
+            if (!isExiting) {
                 await Create(request);
-            }
-            else
-            {
+            } else {
                 await Update(request);
             }
         }
-        public async Task Create(ProjectDto request)
-        {
-            Project project = new Project()
-            {
+        public async Task Create(ProjectDto request) {
+            Project project = new() {
                 Id = Guid.NewGuid().ToStringN(),
                 Domain = request.Domain,
                 Name = request.Name,
@@ -66,36 +55,26 @@ namespace ToolSeoViet.Service.Implements
             this.db.Projects.Add(project);
             await this.db.SaveChangesAsync();
         }
-        public async Task Update(ProjectDto request)
-        {
-            // kiểm tra và lấy ra project đang có
+        public async Task Update(ProjectDto request) {
             var data = await db.Projects.FirstOrDefaultAsync(o => o.Id == request.Id);
-
-            data = new Project()
-            {
+            if (data == null) throw new ManagedException(Messages.Project.Get.Project_NotFound);
+            data = new Project() {
                 Id = data.Id ?? Guid.NewGuid().ToStringN(),
                 Domain = request.Domain ?? data.Domain,
                 Name = request.Name ?? data.Name,
-                UserId = currentUserId,
+                UserId = this.currentUserId,
             };
 
-            var keyWords = new List<KeyWord>();
-
+            var keyWords = new List<ProjectDetail>();
             var keyWordIds = request.KeyWords.Select(o => o.Id).ToList();
-
-            var keyWordOnData = await db.KeyWords.Where(o => o.ProjectId == data.Id).ToListAsync();
-
+            var keyWordOnData = await db.ProjectDetails.Where(o => o.ProjectId == data.Id).ToListAsync();
             var keyWordDeletes = keyWordOnData.Where(o => !keyWordIds.Contains(o.Id));
+            foreach (var item in keyWordDeletes) db.ProjectDetails.Remove(item);
 
-            foreach (var item in keyWordDeletes) db.KeyWords.Remove(item);
-
-
-            var keyWordUpdates = keyWordOnData.Where(o=> keyWordIds.Contains(o.Id));
-            foreach (var item in request.KeyWords)
-            {
-                var keyWord = keyWordUpdates.FirstOrDefault(o=> o.Id == item.Id);
-                keyWords.Add(new KeyWord()
-                {
+            var keyWordUpdates = keyWordOnData.Where(o => keyWordIds.Contains(o.Id));
+            foreach (var item in request.KeyWords) {
+                var keyWord = keyWordUpdates.FirstOrDefault(o => o.Id == item.Id);
+                keyWords.Add(new ProjectDetail() {
                     Id = keyWord.Id ?? Guid.NewGuid().ToStringN(),
                     Name = item.Name,
                     BestPosition = item.BestPosition < keyWord.BestPosition ? item.BestPosition : keyWord.BestPosition,
@@ -105,7 +84,16 @@ namespace ToolSeoViet.Service.Implements
                 });
             }
             keyWordOnData = keyWords;
-            this.db.SaveChanges();
+            await this.db.SaveChangesAsync();
+        }
+
+        public async Task<ListProjectResponse> All() {
+            var projects = await this.db.Projects.Where(o => o.UserId == this.currentUserId).ToListAsync();
+            
+            return new ListProjectResponse() {
+                Items = projects.Select(o => ProjectDto.FromEntity(o)).ToList(),
+                Count = projects.Count,
+            };
         }
     }
 }

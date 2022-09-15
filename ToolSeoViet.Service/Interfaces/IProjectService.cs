@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ToolSeoViet.Database.Models;
+﻿using System.Threading.Tasks;
 using ToolSeoViet.Service.Models.Project;
 
-namespace ToolSeoViet.Service.Interfaces
-{
+namespace ToolSeoViet.Service.Interfaces {
     public interface IProjectService
     {
-        Task<ProjectDto> Get(GetProjectRequest request);
+        Task<GetProjectResponse> Get(string id);
+        Task<ListProjectResponse> All();
         Task CreateOrUpdate(ProjectDto request);
 
     }

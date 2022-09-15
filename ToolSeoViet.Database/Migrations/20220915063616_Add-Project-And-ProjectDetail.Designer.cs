@@ -12,8 +12,8 @@ using ToolSeoViet.Database;
 namespace ToolSeoViet.Database.Migrations
 {
     [DbContext(typeof(ToolSeoVietContext))]
-    [Migration("20220727065146_Init")]
-    partial class Init
+    [Migration("20220915063616_Add-Project-And-ProjectDetail")]
+    partial class AddProjectAndProjectDetail
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,38 +50,6 @@ namespace ToolSeoViet.Database.Migrations
                     b.HasIndex("SearchContentId");
 
                     b.ToTable("Heading", (string)null);
-                });
-
-            modelBuilder.Entity("ToolSeoViet.Database.Models.KeyWord", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<int>("BestPosition")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurrentPosition")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("ProjectId")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("KeyWord", (string)null);
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.Permission", b =>
@@ -217,6 +185,38 @@ namespace ToolSeoViet.Database.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Project", (string)null);
+                });
+
+            modelBuilder.Entity("ToolSeoViet.Database.Models.ProjectDetail", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("BestPosition")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CurrentPosition")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ProjectId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectDetail", (string)null);
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.Role", b =>
@@ -469,17 +469,6 @@ namespace ToolSeoViet.Database.Migrations
                     b.Navigation("SearchContent");
                 });
 
-            modelBuilder.Entity("ToolSeoViet.Database.Models.KeyWord", b =>
-                {
-                    b.HasOne("ToolSeoViet.Database.Models.Project", "Project")
-                        .WithMany("ProjectDetails")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("ToolSeoViet.Database.Models.Project", b =>
                 {
                     b.HasOne("ToolSeoViet.Database.Models.User", "User")
@@ -489,6 +478,17 @@ namespace ToolSeoViet.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ToolSeoViet.Database.Models.ProjectDetail", b =>
+                {
+                    b.HasOne("ToolSeoViet.Database.Models.Project", "Project")
+                        .WithMany("ProjectDetails")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("ToolSeoViet.Database.Models.RolePermission", b =>

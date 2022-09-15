@@ -20,7 +20,7 @@ namespace ToolSeoViet.Service.Models.KeyWord
 
     public partial class KeyWordDto
     {
-        public static KeyWordDto FromEntity(ToolSeoViet.Database.Models.KeyWord entity)
+        public static KeyWordDto FromEntity(ToolSeoViet.Database.Models.ProjectDetail entity)
         {
             if (entity == null) return default;
 

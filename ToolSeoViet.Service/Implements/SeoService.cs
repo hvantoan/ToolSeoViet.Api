@@ -1,17 +1,11 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features.Authentication;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
@@ -20,8 +14,6 @@ using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Service.Utils;
 using ToolSeoViet.Services.Common;
-using ToolSeoViet.Services.Resources;
-using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 using static ToolSeoViet.Service.Enums;
 
@@ -194,8 +186,9 @@ namespace ToolSeoViet.Service.Implements {
 
         public async Task<SearchPosition> Position(SearchPositionRequest request) {
 
+            
             request.Key = request.Key.Replace("  ", " ").Replace(" ", "+");
-            string url = "https://www.google.com.vn" + "/search?q=" + request.Key + "&ie=utf-8&num=100";
+            string url = $"https://www.google.com.vn/search?q={request.Key}&num=10&start=0&ie=utf-8&oe=utf-8&pws=0&hl=vi";
             string result = url.GetHtmlPage();
 
             HtmlDocument htmlDocument = new();
