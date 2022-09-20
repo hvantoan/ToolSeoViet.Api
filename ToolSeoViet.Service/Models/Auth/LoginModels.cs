@@ -1,5 +1,4 @@
-﻿namespace ToolSeoViet.Services.Models.Auth
-{
+﻿namespace ToolSeoViet.Services.Models.Auth {
 
     public class LoginRequest
     {

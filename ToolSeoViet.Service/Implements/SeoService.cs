@@ -100,7 +100,7 @@ namespace ToolSeoViet.Service.Implements {
             return searchContent;
         }
 
-        public async Task<HeadingDto> GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries) {
+        public static async Task<HeadingDto> GetScraping(string url, int position, string h1, Dictionary<string, ViDictionary> dictionaries) {
 
             HtmlDocument htmlDocument = new();
             string htmlDetail = url.GetHtmlDetail();
@@ -160,12 +160,12 @@ namespace ToolSeoViet.Service.Implements {
             };
         }
 
-        public async Task<List<SearchSLIKey>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries) {
+        public static async Task<List<SearchSLIKey>> GetSLI(List<string> wordsList, Dictionary<string, ViDictionary> dictionaries) {
             Dictionary<string, int> wordDic = new();
             for (int i = 0; i < wordsList.Count; i++) {
                 List<string> strTemp = wordsList[i].Split(new string[] { " ", "," }, StringSplitOptions.None).ToList();
                 for (int j = 0; j < strTemp.Count - 1; j++) {
-                    string str = strTemp[j].getStr() + " " + strTemp[j + 1].getStr();
+                    string str = strTemp[j].GetStr() + " " + strTemp[j + 1].GetStr();
                     if (wordDic.ContainsKey(str)) {
                         wordDic[str]++;
                     } else {
@@ -212,7 +212,7 @@ namespace ToolSeoViet.Service.Implements {
                 string heading = System.Web.HttpUtility.HtmlDecode(h3.InnerText.Trim()).SplitGotoRow().FirstOrDefault(o => !string.IsNullOrEmpty(o));
                 if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(heading)) continue;
 
-                if (href.IndexOf(request.Domain) >= 0) {
+                if (href.Contains(request.Domain, StringComparison.CurrentCulture)) {
                     return await Task.FromResult(new SearchPosition() {
                         Href = href.GetHref(),
                         Key = request.Key.Replace("+", " "),
@@ -245,7 +245,7 @@ namespace ToolSeoViet.Service.Implements {
                     string href = WebUtility.UrlDecode(a.GetAttributeValue("href", string.Empty));
                     if (string.IsNullOrEmpty(href)) continue;
 
-                    if (href.IndexOf(request.Href) >= 0) {
+                    if (href.Contains(request.Href, StringComparison.CurrentCulture)) {
                         return await Task.FromResult(new SearchIndex() {
                             Href = href.GetHref(),
                             Status = ECheckIndex.Done

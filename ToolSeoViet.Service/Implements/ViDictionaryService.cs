@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
 using ToolSeoViet.Service.Interfaces;

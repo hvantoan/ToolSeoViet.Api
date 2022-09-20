@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static ToolSeoViet.Service.Enums;
+﻿using static ToolSeoViet.Service.Enums;
 
 namespace ToolSeoViet.Service.Models.Seo {
     public partial class SearchIndex {

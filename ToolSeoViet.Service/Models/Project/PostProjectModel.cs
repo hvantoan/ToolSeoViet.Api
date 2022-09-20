@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ToolSeoViet.Services.Models;
+﻿using ToolSeoViet.Services.Models;
 
-namespace ToolSeoViet.Service.Models.Project
-{
+namespace ToolSeoViet.Service.Models.Project {
     public class PostProjectModel : BaseGetRequest
     {
     }

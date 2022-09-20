@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using ToolSeoViet.Services.Models.Role;
 
-namespace ToolSeoViet.Services.Models.User
-{
+namespace ToolSeoViet.Services.Models.User {
 
     public partial class UserDto
     {

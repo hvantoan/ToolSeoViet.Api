@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ToolSeoViet.Service.Models.Auth
-{
+﻿namespace ToolSeoViet.Service.Models.Auth {
     public class SignUpRequest
     {
         public string UserName { get; set; }

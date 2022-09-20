@@ -4,35 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 
 namespace ToolSeoViet.Service.Extensions {
     public static class StringExtention { 
-        private static int block;
-        private static string content;
-        public static string GetGoogleResearch(this string url) {
-
-            WebClient webClient = new();
-            block = 1;
-            webClient.DownloadStringCompleted += (sender, e) => {
-                block = 0;
-                content = e.Result;
-            };
-            webClient.DownloadStringAsync(new Uri(url));
-            while (block == 1) {
-
-                Thread.Sleep(10);
-            }
-            return content;
-        }
-        public static string getStr(this string str) {
-            string strTemp = (str.EndsWith("”") || str.EndsWith("\"") || str.EndsWith("?") || str.EndsWith(".") || str.EndsWith(":")) ? str.Substring(0, str.Length - 1) : str;
+        
+        public static string GetStr(this string str) {
+            string strTemp = (str.EndsWith("”") || str.EndsWith("\"") || str.EndsWith("?") || str.EndsWith(".") || str.EndsWith(":")) ? str[..^1] : str;
             return strTemp.ToLower().Trim();
         }
 
         public static string GetHtmlPage(this string strURL) {
-            String strResult;
+            string strResult;
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
             WebRequest objRequest = WebRequest.Create(strURL);
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
             objRequest.Timeout = 2000;
             WebResponse objResponse = objRequest.GetResponse();
 
@@ -51,18 +36,17 @@ namespace ToolSeoViet.Service.Extensions {
         }
 
         public static List<string> SplitGotoRow(this string content) {
-            List<string> result = new List<string>();
+            List<string> result = new();
             if (!content.Contains("\r\n")) {
                 if (!string.IsNullOrEmpty(content))
                     result.Add(content.Trim());
                 return result;
             }
-            List<string> hList = new List<string>();
-            hList = content.Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList();
+            List<string> hList = content.Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList() ?? new();
             for (int i = 0; i < hList.Count; i++) {
                 if (string.IsNullOrEmpty(hList[i]))
                     continue;
-                if (hList[i].Contains("\r") || hList[i].Contains("\n")) {
+                if (hList[i].Contains('\r') || hList[i].Contains('\n')) {
                     List<string> MTemp1 = hList[i].Split(new string[] { "\n" }, StringSplitOptions.None).ToList();
                     for (int j = 0; j < MTemp1.Count; j++) {
                         if (string.IsNullOrEmpty(MTemp1[j]))
@@ -85,18 +69,24 @@ namespace ToolSeoViet.Service.Extensions {
             }
             return result;
         }
+        
         public static string GetHtmlDetail(this string url) {
             try {
-                var request = (HttpWebRequest)WebRequest.Create(url);
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
                 request.Timeout = 5000; //Timeout after 1000 ms
+#pragma warning disable IDE0063 // Use simple 'using' statement
                 using (var stream = request.GetResponse().GetResponseStream())
                 using (var reader = new System.IO.StreamReader(stream)) {
                     return reader.ReadToEnd();
                 }
+#pragma warning restore IDE0063 // Use simple 'using' statement
             } catch (Exception) {
                 return "";
             }
         }
+
         public static List<string> GetBodyStr(this HtmlNode body) {
             foreach (var script in body.Descendants("script").ToArray())
                 script.Remove();
@@ -111,14 +101,16 @@ namespace ToolSeoViet.Service.Extensions {
             foreach (var item in body.Descendants("videoitem").ToArray())
                 item.Remove();
 
-            List<string> strList = new List<string>();
+            List<string> strList = new();
+#pragma warning disable CS0618 // Type or member is obsolete
             var temp = body.DescendantNodesAndSelf().ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
             for (int i = 0; i < temp.Count; i++) {
                 if (!temp[i].HasChildNodes) {
                     string text = WebUtility.HtmlDecode(temp[i].InnerText);
                     if (!string.IsNullOrEmpty(text)) {
-                        StringBuilder sb = new StringBuilder(text.Trim());
+                        StringBuilder sb = new(text.Trim());
                         sb.Replace("\n\n", "\n");
                         sb.Replace("\t\t", "\t");
                         sb.Replace("\r\r", "\r");

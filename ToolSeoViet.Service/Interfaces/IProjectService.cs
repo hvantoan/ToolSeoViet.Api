@@ -8,5 +8,6 @@ namespace ToolSeoViet.Service.Interfaces {
         Task<ListProjectResponse> All();
         Task CreateOrUpdate(ProjectDto request);
 
+        Task Delete(string Id);
     }
 }

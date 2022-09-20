@@ -4,7 +4,6 @@ using System;
 using System.Threading.Tasks;
 using ToolSeoViet.Service.Interfaces;
 using ToolSeoViet.Service.Models.Seo;
-using ToolSeoViet.Services.Interfaces;
 using ToolSeoViet.Services.Models;
 
 namespace ToolSeoViet.Api.Controllers {

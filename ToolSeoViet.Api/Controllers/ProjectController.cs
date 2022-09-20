@@ -44,5 +44,14 @@ namespace ToolSeoViet.Api.Controllers {
             }
         }
 
+        [HttpPost, Route("delete")]
+        public async Task<BaseResponse> Delete(DeleteProjectRequest request) {
+            try {
+                await this.projectService.Delete(request.Id);
+                return BaseResponse.Ok();
+            } catch (Exception ex) {
+                return BaseResponse.Fail(ex.Message);
+            }
+        }
     }
 }

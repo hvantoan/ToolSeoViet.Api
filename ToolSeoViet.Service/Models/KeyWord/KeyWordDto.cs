@@ -1,12 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ToolSeoViet.Service.Models.KeyWord
-{
+namespace ToolSeoViet.Service.Models.KeyWord {
     public partial class KeyWordDto
     {
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]

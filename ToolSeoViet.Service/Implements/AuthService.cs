@@ -25,12 +25,10 @@ using TuanVu.Services.Extensions;
 namespace ToolSeoViet.Services.Implements {
 
     public class AuthService : BaseService, IAuthService {
-        private readonly IConfiguration configuration;
 
 
         public AuthService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
             : base(db, httpContextAccessor, configuration) {
-            this.configuration = configuration;
         }
 
         public async Task<LoginResponse> WebLogin(LoginRequest request) {
