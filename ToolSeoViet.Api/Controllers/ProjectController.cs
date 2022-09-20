@@ -37,7 +37,7 @@ namespace ToolSeoViet.Api.Controllers {
         [HttpPost, Route("save")]
         public async Task<BaseResponse> Save(SaveProjectRequest request) {
             try {
-                await this.projectService.CreateOrUpdate(request.Project);
+                await this.projectService.CreateOrUpdate(request);
                 return BaseResponse.Ok();
             } catch (Exception ex) {
                 return BaseResponse.Fail(ex.Message);

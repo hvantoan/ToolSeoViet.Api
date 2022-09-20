@@ -6,7 +6,7 @@ namespace ToolSeoViet.Service.Interfaces {
     {
         Task<GetProjectResponse> Get(string id);
         Task<ListProjectResponse> All();
-        Task CreateOrUpdate(ProjectDto request);
+        Task CreateOrUpdate(SaveProjectRequest request);
 
         Task Delete(string Id);
     }

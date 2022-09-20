@@ -17,7 +17,7 @@ namespace ToolSeoViet.Service.Implements {
     public class ProjectService : BaseService, IProjectService {
         public ProjectService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor) : base(db, httpContextAccessor) {
         }
-        
+
         public async Task<GetProjectResponse> Get(string id) {
             var data = await db.Projects.Include(k => k.ProjectDetails).AsNoTracking().FirstOrDefaultAsync(o => o.UserId == this.currentUserId && o.Id == id);
             if (data == null) throw new ManagedException(Messages.Project.Get.Project_NotFound);
@@ -28,8 +28,8 @@ namespace ToolSeoViet.Service.Implements {
                 Message = "Lấy dữ liệu thành công."
             };
         }
-        
-        public async Task CreateOrUpdate(ProjectDto request) {
+
+        public async Task CreateOrUpdate(SaveProjectRequest request) {
             var isExiting = await db.Projects.AnyAsync(o => o.Id == request.Id);
             if (!isExiting) {
                 await Create(request);
@@ -37,15 +37,15 @@ namespace ToolSeoViet.Service.Implements {
                 await Update(request);
             }
         }
-        
-        public async Task Create(ProjectDto request) {
+
+        public async Task Create(SaveProjectRequest request) {
             request.Name = request.Name.Trim();
             if (string.IsNullOrEmpty(request.Name)) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotNullOrEmplty);
-            var existed = this.db.Projects.Where(o=>o.UserId == this.currentUserId).Any(o => o.Name == (request.Name ?? ""));
+            var existed = this.db.Projects.Where(o => o.UserId == this.currentUserId).Any(o => o.Name == (request.Name ?? ""));
             if (existed) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotDuplicated);
 
             Project project = new() {
-                Id = Guid.NewGuid().ToStringN(),
+                Id = request.Id ?? Guid.NewGuid().ToStringN(),
                 Domain = request.Domain,
                 Name = request.Name,
                 UserId = currentUserId
@@ -53,44 +53,47 @@ namespace ToolSeoViet.Service.Implements {
             this.db.Projects.Add(project);
             await this.db.SaveChangesAsync();
         }
-        
-        public async Task Update(ProjectDto request) {
+
+        public async Task Update(SaveProjectRequest request) {
             var data = await db.Projects.FirstOrDefaultAsync(o => o.Id == request.Id);
             if (data == null) throw new ManagedException(Messages.Project.Get.Project_NotFound);
-            
+
             request.Name = request.Name.Trim();
             if (string.IsNullOrEmpty(request.Name)) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotNullOrEmplty);
-            
-            var existed = this.db.Projects.Where(o => o.UserId == this.currentUserId).Where(o=>o.Id != data.Id).Any(o => o.Name == (request.Name ?? ""));
+
+            var existed = this.db.Projects.Where(o => o.UserId == this.currentUserId).Where(o => o.Id != data.Id).Any(o => o.Name == (request.Name ?? ""));
             if (existed) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotDuplicated);
 
-            data = new Project() {
-                Id = data.Id ?? Guid.NewGuid().ToStringN(),
-                Domain = request.Domain ?? data.Domain,
-                Name = request.Name ?? data.Name,
-                UserId = this.currentUserId,
-            };
+            data.Id ??= Guid.NewGuid().ToStringN();
+            data.Domain = request.Domain ?? data.Domain;
+            data.Name = request.Name ?? data.Name;
+            data.UserId = currentUserId;
 
             var keyWords = new List<ProjectDetail>();
             var keyWordIds = request.KeyWords.Select(o => o.Id).ToList();
-            var keyWordOnData = await db.ProjectDetails.Where(o => o.ProjectId == data.Id).Distinct().ToListAsync();
+            var keyWordOnData = await db.ProjectDetails.Where(o => o.ProjectId == data.Id).ToListAsync();
 
             var keyWordDeletes = keyWordOnData.Where(o => !keyWordIds.Contains(o.Id));
             this.db.ProjectDetails.RemoveRange(keyWordDeletes);
 
             var keyWordUpdates = keyWordOnData.Where(o => keyWordIds.Contains(o.Id));
             foreach (var item in request.KeyWords) {
-                var keyWord = keyWordUpdates.FirstOrDefault(o => o.Id == item.Id);
-                keyWords.Add(new ProjectDetail() {
+                var keyWord = keyWordUpdates.FirstOrDefault(o => o.Id == item.Id) ?? new();
+                var temp = new ProjectDetail() {
                     Id = keyWord.Id ?? Guid.NewGuid().ToStringN(),
                     Name = item.Name,
-                    BestPosition = item.BestPosition < keyWord.BestPosition ? item.BestPosition : keyWord.BestPosition,
                     CurrentPosition = item.CurrentPosition,
                     ProjectId = data.Id,
                     Url = item.Url
-                });
+                };
+                temp.BestPosition = keyWord.BestPosition;
+                if (item.CurrentPosition < keyWord.BestPosition && item.CurrentPosition > 0) temp.BestPosition = item.CurrentPosition;
+                if (keyWord.BestPosition == 0 && item.CurrentPosition > 0) temp.BestPosition = item.CurrentPosition;
+
+                keyWords.Add(temp);
             }
-            keyWordOnData = keyWords;
+            data.ProjectDetails = keyWords;
+
             await this.db.SaveChangesAsync();
         }
 
@@ -104,9 +107,9 @@ namespace ToolSeoViet.Service.Implements {
         }
 
         public async Task Delete(string Id) {
-            var project = await this.db.Projects.Include(o=>o.ProjectDetails).FirstOrDefaultAsync(o => o.Id == Id && o.UserId == this.currentUserId);
+            var project = await this.db.Projects.Include(o => o.ProjectDetails).FirstOrDefaultAsync(o => o.Id == Id && o.UserId == this.currentUserId);
             if (project == null) throw new ManagedException(Messages.Project.Project_NotFound);
-            
+
             try {
                 if (project.ProjectDetails.Any()) {
                     this.db.ProjectDetails.RemoveRange(project.ProjectDetails);
@@ -114,7 +117,7 @@ namespace ToolSeoViet.Service.Implements {
                 this.db.Projects.Remove(project);
                 await this.db.SaveChangesAsync();
             } catch (Exception ex) {
-                throw new ManagedException(ex.Message);            
+                throw new ManagedException(ex.Message);
             }
 
         }

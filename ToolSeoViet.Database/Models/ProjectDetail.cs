@@ -7,9 +7,9 @@ namespace ToolSeoViet.Database.Models {
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public int CurrentPosition { get; set; }
-        public int BestPosition { get; set; }
-        public string Url { get; set; }
+        public int CurrentPosition { get; set; } = 0;
+        public int BestPosition { get; set; } = 0;
+        public string Url { get; set; } = "";
         public string ProjectId { get; set; }
         public Project Project { get; set; }
     }
