@@ -43,6 +43,7 @@ namespace ToolSeoViet.Service.Implements {
             if (string.IsNullOrEmpty(request.Name)) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotNullOrEmplty);
             var existed = this.db.Projects.Where(o => o.UserId == this.currentUserId).Any(o => o.Name == (request.Name ?? ""));
             if (existed) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotDuplicated);
+            if (string.IsNullOrEmpty(request.Id)) request.Id = null;
 
             Project project = new() {
                 Id = request.Id ?? Guid.NewGuid().ToStringN(),
