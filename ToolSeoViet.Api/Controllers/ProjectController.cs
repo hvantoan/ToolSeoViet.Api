@@ -28,7 +28,7 @@ namespace ToolSeoViet.Api.Controllers {
         public async Task<BaseResponse> Get(GetProjectRequest request) {
             try {
                 var response = await this.projectService.Get(request.Id);
-                return BaseResponse<GetProjectResponse>.Ok(response);
+                return BaseResponse<ProjectDto>.Ok(response);
             } catch (Exception ex) {
                 return BaseResponse.Fail(ex.Message);
             }

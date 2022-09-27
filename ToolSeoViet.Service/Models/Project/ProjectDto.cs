@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
-using ToolSeoViet.Service.Models.KeyWord;
 
 namespace ToolSeoViet.Service.Models.Project {
     public partial class ProjectDto {
@@ -11,7 +10,7 @@ namespace ToolSeoViet.Service.Models.Project {
         public string UserId { get; set; }
         public string Domain { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public List<KeyWordDto> KeyWords { get; set; }
+        public List<ProjectDetailDto> ProjectDetails { get; set; }
     }
 
     public partial class ProjectDto {
@@ -22,7 +21,7 @@ namespace ToolSeoViet.Service.Models.Project {
                 Id = entity.Id,
                 Domain = entity.Domain,
                 Name = entity.Name,
-                KeyWords = entity.ProjectDetails?.Select(o => KeyWordDto.FromEntity(o)).ToList()
+                ProjectDetails = entity.ProjectDetails?.Select(o => ProjectDetailDto.FromEntity(o)).ToList()
             };
         }
     }

@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using ToolSeoViet.Service.Models.KeyWord;
-using ToolSeoViet.Services.Models;
 
 namespace ToolSeoViet.Service.Models.Project {
     public class GetProjectRequest {
@@ -14,7 +12,7 @@ namespace ToolSeoViet.Service.Models.Project {
         public string UserId { get; set; }
         public string Domain { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public List<KeyWordDto> KeyWords { get; set; }
+        public List<ProjectDetailDto> ProjectDetails { get; set; }
     }
     public class DeleteProjectRequest {
         public string Id { get; set; }

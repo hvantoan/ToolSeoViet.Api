@@ -1,8 +1,7 @@
-﻿namespace ToolSeoViet.Service.Models.Seo {
-    public partial class SearchPosition {
-        public string Key { get; set; }
-        public string Name { get; set; }
-        public int Position { get; set; }
-        public string Href { get; set; }
+﻿using ToolSeoViet.Service.Models.Project;
+using ToolSeoViet.Services.Models;
+
+namespace ToolSeoViet.Service.Models.Seo {
+    public partial class SearchPosition : BaseResponse<ProjectDetailDto> {
     }
 }

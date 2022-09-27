@@ -11,6 +11,7 @@ using ToolSeoViet.Database;
 using ToolSeoViet.Database.Models;
 using ToolSeoViet.Service.Extensions;
 using ToolSeoViet.Service.Interfaces;
+using ToolSeoViet.Service.Models.Project;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Service.Utils;
 using ToolSeoViet.Services.Common;
@@ -73,7 +74,7 @@ namespace ToolSeoViet.Service.Implements {
                 HeadingDto temp = ((Task<HeadingDto>)taskList[i]).Result;
                 headings.Add(temp);
                 var keys = total.Select(o => o.KeyWord).ToList();
-                
+
                 List<SearchSLIKey> keyWordExisted;
                 List<SearchSLIKey> keyWordNotExisted;
 
@@ -92,7 +93,7 @@ namespace ToolSeoViet.Service.Implements {
             var searchContent = new SearchContentDto() {
                 DateCreated = DateTimeOffset.Now,
                 Headings = headings ?? new List<HeadingDto>(),
-                SLI = total.Any() ? total.OrderByDescending(o=>o.Count).Take(50).ToList() : null,
+                SLI = total.Any() ? total.OrderByDescending(o => o.Count).Take(50).ToList() : null,
                 Name = request.KeyWord.Replace("+", " ")
             };
             await searchContentService.Save(searchContent);
@@ -186,7 +187,6 @@ namespace ToolSeoViet.Service.Implements {
 
         public async Task<SearchPosition> Position(SearchPositionRequest request) {
 
-            
             request.Key = request.Key.Replace("  ", " ").Replace(" ", "+");
             string url = $"https://www.google.com.vn/search?q={request.Key}&num=10&start=0&ie=utf-8&oe=utf-8&pws=0&hl=vi";
             string result = url.GetHtmlPage();
@@ -214,14 +214,17 @@ namespace ToolSeoViet.Service.Implements {
 
                 if (href.Contains(request.Domain, StringComparison.CurrentCulture)) {
                     return await Task.FromResult(new SearchPosition() {
-                        Href = href.GetHref(),
-                        Key = request.Key.Replace("+", " "),
-                        Name = heading,
-                        Position = i + 1
+                        Data = new ProjectDetailDto() {
+                            Url = href.GetHref(),
+                            Key = request.Key.Replace("+", " "),
+                            Name = heading,
+                            CurrentPosition = i + 1,
+                            BestPosition = i + 1
+                        }
                     });
                 }
             }
-            return await Task.FromResult(new SearchPosition() { Key = request.Key });
+            return await Task.FromResult(new SearchPosition() { Data = new ProjectDetailDto() { Key = request.Key } });
         }
 
         public async Task<SearchIndex> Index(SearchIndexRequest request) {

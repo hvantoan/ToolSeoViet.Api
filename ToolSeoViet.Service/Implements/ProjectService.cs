@@ -18,15 +18,11 @@ namespace ToolSeoViet.Service.Implements {
         public ProjectService(ToolSeoVietContext db, IHttpContextAccessor httpContextAccessor) : base(db, httpContextAccessor) {
         }
 
-        public async Task<GetProjectResponse> Get(string id) {
+        public async Task<ProjectDto> Get(string id) {
             var data = await db.Projects.Include(k => k.ProjectDetails).AsNoTracking().FirstOrDefaultAsync(o => o.UserId == this.currentUserId && o.Id == id);
             if (data == null) throw new ManagedException(Messages.Project.Get.Project_NotFound);
 
-            return new() {
-                Data = ProjectDto.FromEntity(data),
-                Success = true,
-                Message = "Lấy dữ liệu thành công."
-            };
+            return ProjectDto.FromEntity(data);
         }
 
         public async Task CreateOrUpdate(SaveProjectRequest request) {
@@ -71,23 +67,23 @@ namespace ToolSeoViet.Service.Implements {
             data.UserId = currentUserId;
 
             var keyWords = new List<ProjectDetail>();
-            var keyWordIds = request.KeyWords.Select(o => o.Id).ToList();
+            var keyWordIds = request.ProjectDetails.Select(o => o.Id).ToList();
             var keyWordOnData = await db.ProjectDetails.Where(o => o.ProjectId == data.Id).ToListAsync();
 
             var keyWordDeletes = keyWordOnData.Where(o => !keyWordIds.Contains(o.Id));
             this.db.ProjectDetails.RemoveRange(keyWordDeletes);
 
             var keyWordUpdates = keyWordOnData.Where(o => keyWordIds.Contains(o.Id));
-            foreach (var item in request.KeyWords) {
+            foreach (var item in request.ProjectDetails) {
                 var keyWord = keyWordUpdates.FirstOrDefault(o => o.Id == item.Id) ?? new();
-                var temp = new ProjectDetail() {
+                var temp = new ProjectDetail {
                     Id = keyWord.Id ?? Guid.NewGuid().ToStringN(),
                     Name = item.Name,
                     CurrentPosition = item.CurrentPosition,
                     ProjectId = data.Id,
-                    Url = item.Url
+                    Url = item.Url,
+                    BestPosition = keyWord.BestPosition
                 };
-                temp.BestPosition = keyWord.BestPosition;
                 if (item.CurrentPosition < keyWord.BestPosition && item.CurrentPosition > 0) temp.BestPosition = item.CurrentPosition;
                 if (keyWord.BestPosition == 0 && item.CurrentPosition > 0) temp.BestPosition = item.CurrentPosition;
 
