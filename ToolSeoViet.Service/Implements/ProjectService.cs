@@ -45,8 +45,15 @@ namespace ToolSeoViet.Service.Implements {
                 Id = request.Id ?? Guid.NewGuid().ToStringN(),
                 Domain = request.Domain,
                 Name = request.Name,
-                UserId = currentUserId
+                UserId = currentUserId,
             };
+
+            project.ProjectDetails = request?.ProjectDetails?.Select(o => new ProjectDetail() {
+                Id = Guid.NewGuid().ToStringN(),
+                Key = o.Key,
+                ProjectId = project.Id,
+            }).ToList();
+
             this.db.Projects.Add(project);
             await this.db.SaveChangesAsync();
         }
