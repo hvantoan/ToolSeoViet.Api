@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -15,6 +16,8 @@ using ToolSeoViet.Service.Models.Project;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Service.Utils;
 using ToolSeoViet.Services.Common;
+using ToolSeoViet.Services.Resources;
+using TuanVu.Services.Exceptions;
 using TuanVu.Services.Extensions;
 using static ToolSeoViet.Service.Enums;
 
@@ -185,10 +188,10 @@ namespace ToolSeoViet.Service.Implements {
             return await Task.FromResult(result);
         }
 
-        public async Task<SearchPosition> Position(SearchPositionRequest request) {
-
-            request.Key = request.Key.Replace("  ", " ").Replace(" ", "+");
-            string url = $"https://www.google.com.vn/search?q={request.Key}&num=10&start=0&ie=utf-8&oe=utf-8&pws=0&hl=vi";
+        public async Task<ProjectDetailDto> Position(SearchPositionRequest request) {
+            Console.WriteLine(request.ProjectDetail.Id);
+            request.ProjectDetail.Key = request.ProjectDetail.Key.Replace("  ", " ").Replace(" ", "+");
+            string url = $"https://www.google.com.vn/search?q={request.ProjectDetail.Key}&num=10&start=0&ie=utf-8&oe=utf-8&pws=0&hl=vi";
             string result = url.GetHtmlPage();
 
             HtmlDocument htmlDocument = new();
@@ -213,18 +216,32 @@ namespace ToolSeoViet.Service.Implements {
                 if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(heading)) continue;
 
                 if (href.Contains(request.Domain, StringComparison.CurrentCulture)) {
-                    return await Task.FromResult(new SearchPosition() {
-                        Data = new ProjectDetailDto() {
-                            Url = href.GetHref(),
-                            Key = request.Key.Replace("+", " "),
-                            Name = heading,
-                            CurrentPosition = i + 1,
-                            BestPosition = i + 1
-                        }
-                    });
+                    var item = new ProjectDetailDto() {
+                        Id = request.ProjectDetail.Id,
+                        Url = href.GetHref(),
+                        Key = request.ProjectDetail.Key.Replace("+", " "),
+                        Name = heading,
+                        CurrentPosition = i + 1,
+                        BestPosition = i + 1,
+                        ProjectId = request.ProjectDetail.ProjectId,
+                    };
+                    await SaveProjectDetail(item);
+                    return await Task.FromResult(item);
                 }
             }
-            return await Task.FromResult(new SearchPosition() { Data = new ProjectDetailDto() { Key = request.Key } });
+            return await Task.FromResult(new ProjectDetailDto() { Key = request.ProjectDetail.Key });
+        }
+
+        public async Task SaveProjectDetail(ProjectDetailDto data) {
+            var query = await this.db.ProjectDetails.FirstOrDefaultAsync(o => o.Id == data.Id);
+            if (query == null)
+                throw new ManagedException(Messages.Project.Project_NotFound);
+            query.CurrentPosition = data.CurrentPosition;
+            query.BestPosition = data.BestPosition;
+            query.Name = data.Name;
+            query.Url = data.Url;
+
+            await this.db.SaveChangesAsync();
         }
 
         public async Task<SearchIndex> Index(SearchIndexRequest request) {

@@ -37,7 +37,8 @@
             }
         }
         public static class Project {
-            public const string Project_NotFound = "Phân quyền không tồn tại.";
+            public const string Project_NotFound = "Dự án không tồn tại.";
+            public const string ProjectDetail_NotFound = "Từ khóa không tồn tại.";
             public static class CreateOrUpdate {
                 public const string Project_NameNotNullOrEmplty = "Tên không được để trống.";
                 public const string Project_NameNotDuplicated = "Tên dự án đã được sử dụngs.";

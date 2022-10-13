@@ -34,6 +34,8 @@ namespace ToolSeoViet.Service.Implements {
             }
         }
 
+       
+
         public async Task Create(SaveProjectRequest request) {
             request.Name = request.Name.Trim();
             if (string.IsNullOrEmpty(request.Name)) throw new ManagedException(Messages.Project.CreateOrUpdate.Project_NameNotNullOrEmplty);
