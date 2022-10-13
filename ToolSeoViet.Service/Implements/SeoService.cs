@@ -196,7 +196,7 @@ namespace ToolSeoViet.Service.Implements {
 
             HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(result);
-            string divClass = configuration["SeoToolConfig:divCSS"];
+            string divClass = configuration["SeoToolConfig:divCSS"]; 
             string devDescription = configuration["SeoToolConfig:divDescription"];
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
 
