@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using ToolSeoViet.Service.Interfaces;
+using ToolSeoViet.Service.Models.Project;
 using ToolSeoViet.Service.Models.Seo;
 using ToolSeoViet.Services.Models;
 
@@ -29,7 +30,7 @@ namespace ToolSeoViet.Api.Controllers {
         public async Task<BaseResponse> Position(SearchPositionRequest request) {
             try {
                 var response = await this.seoService.Position(request);
-                return BaseResponse<SearchPosition>.Ok(response);
+                return BaseResponse<ProjectDetailDto>.Ok(response);
             } catch (Exception ex) {
                 return BaseResponse.Fail(ex.Message);
             }
