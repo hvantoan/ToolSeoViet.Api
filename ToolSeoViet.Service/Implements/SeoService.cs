@@ -198,7 +198,7 @@ namespace ToolSeoViet.Service.Implements {
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
 
             for (int i = 0; i < divList.Count; i++) {
-                var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
+                var temp = divList[i].Descendants("div").FirstOrDefault(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass));
                 if (temp == null)
                     continue;
                 var a = temp.Descendants("a").FirstOrDefault();
@@ -238,7 +238,7 @@ namespace ToolSeoViet.Service.Implements {
             var divList = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class,'" + devDescription + "')]");
             if (divList != null) {
                 for (int i = 0; i < divList.Count; i++) {
-                    var temp = divList[i].Descendants("div").Where(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass)).FirstOrDefault();
+                    var temp = divList[i].Descendants("div").FirstOrDefault(s => s.Attributes["class"] != null && s.Attributes["class"].Value.Contains(divClass));
                     if (temp == null)
                         continue;
                     var a = temp.Descendants("a").FirstOrDefault();

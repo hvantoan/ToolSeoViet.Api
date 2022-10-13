@@ -6,6 +6,7 @@ namespace ToolSeoViet.Database.Models {
     public partial class ProjectDetail
     {
         public string Id { get; set; }
+        public int Ordinal { get; set; }
         public string Key { get; set; }
         public string Name { get; set; }
         public int CurrentPosition { get; set; }

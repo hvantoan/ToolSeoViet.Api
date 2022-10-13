@@ -1,6 +1,7 @@
 ﻿namespace ToolSeoViet.Service.Models.Project {
     public partial class ProjectDetailDto {
         public string Id { get; set; }
+        public int Ordinal { get; set; }
         public string Key { get; set; }
         public string Name { get; set; }
         public int CurrentPosition { get; set; } = 0;
@@ -15,6 +16,7 @@
 
             return new ProjectDetailDto {
                 Id = entity.Id,
+                Ordinal = entity.Ordinal,
                 Key = entity.Key,
                 Name = entity.Name,
                 CurrentPosition = entity.CurrentPosition,

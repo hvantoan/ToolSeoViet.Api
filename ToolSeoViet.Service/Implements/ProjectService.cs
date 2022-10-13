@@ -21,7 +21,7 @@ namespace ToolSeoViet.Service.Implements {
         public async Task<ProjectDto> Get(string id) {
             var data = await db.Projects.Include(k => k.ProjectDetails).AsNoTracking().FirstOrDefaultAsync(o => o.UserId == this.currentUserId && o.Id == id);
             if (data == null) throw new ManagedException(Messages.Project.Get.Project_NotFound);
-
+            data.ProjectDetails = data.ProjectDetails.OrderBy(o => o.Ordinal).ToList();
             return ProjectDto.FromEntity(data);
         }
 
@@ -50,9 +50,18 @@ namespace ToolSeoViet.Service.Implements {
 
             project.ProjectDetails = request?.ProjectDetails?.Select(o => new ProjectDetail() {
                 Id = Guid.NewGuid().ToStringN(),
+                Ordinal = o.Ordinal,
                 Key = o.Key,
                 ProjectId = project.Id,
             }).ToList();
+
+            int counter = 0;
+           
+            foreach (var item in project.ProjectDetails) {
+                counter++;
+                Console.WriteLine(counter);
+                item.Ordinal = counter;
+            }
 
             this.db.Projects.Add(project);
             await this.db.SaveChangesAsync();
@@ -74,17 +83,19 @@ namespace ToolSeoViet.Service.Implements {
             data.UserId = currentUserId;
 
             var keyWords = new List<ProjectDetail>();
-            var keyWordIds = request.ProjectDetails.Select(o => o.Id).ToList();
+            var keyWordIds = request.ProjectDetails.Where(o=>!string.IsNullOrEmpty(o.Id)).Select(o => o.Id).ToList();
             var keyWordOnData = await db.ProjectDetails.Where(o => o.ProjectId == data.Id).ToListAsync();
 
             var keyWordDeletes = keyWordOnData.Where(o => !keyWordIds.Contains(o.Id));
-            this.db.ProjectDetails.RemoveRange(keyWordDeletes);
+
+            if (keyWordDeletes != null) this.db.ProjectDetails.RemoveRange(keyWordDeletes);
 
             var keyWordUpdates = keyWordOnData.Where(o => keyWordIds.Contains(o.Id));
             foreach (var item in request.ProjectDetails) {
                 var keyWord = keyWordUpdates.FirstOrDefault(o => o.Id == item.Id) ?? new();
                 var temp = new ProjectDetail {
                     Id = keyWord.Id ?? Guid.NewGuid().ToStringN(),
+                    Key = item.Key,
                     Name = item.Name,
                     CurrentPosition = item.CurrentPosition,
                     ProjectId = data.Id,
@@ -96,6 +107,9 @@ namespace ToolSeoViet.Service.Implements {
 
                 keyWords.Add(temp);
             }
+
+            int counter = 0;
+            keyWords.ForEach(o => o.Ordinal = ++counter);
             data.ProjectDetails = keyWords;
 
             await this.db.SaveChangesAsync();
