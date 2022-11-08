@@ -104,7 +104,7 @@ namespace ToolSeoViet.Api {
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseSwagger().UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToolSeoViet.Api v1"));
+            app.UseSwagger().UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToolSeoViet.Api v1.1"));
 
             app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
