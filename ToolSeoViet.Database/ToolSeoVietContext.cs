@@ -30,7 +30,7 @@ namespace ToolSeoViet.Database {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             if (!optionsBuilder.IsConfigured) {
-                optionsBuilder.UseSqlServer("Server=.;Database=Test; Trusted_connection=true");
+                optionsBuilder.UseNpgsql("Server=.;Database=Test; Trusted_connection=true");
             }
         }
 
