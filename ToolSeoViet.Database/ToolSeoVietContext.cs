@@ -30,7 +30,7 @@ namespace ToolSeoViet.Database {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             if (!optionsBuilder.IsConfigured) {
-                optionsBuilder.UseSqlServer("Server=.;Database=Test; Trusted_connection=true");
+                optionsBuilder.UseNpgsql("Server=ec2-44-209-57-4.compute-1.amazonaws.com;Port=5432;Database=d6fbbhmk7vpd6t;User Id=leemwdukezeali;Password=780351960e6d24ef88842fad33ed7f3486f213b60dae01aeed022547c53029fc;sslmode=Require;TrustServerCertificate=True;");
             }
         }
 
