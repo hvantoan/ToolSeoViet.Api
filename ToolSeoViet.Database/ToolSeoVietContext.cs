@@ -3,6 +3,7 @@ using System.Reflection;
 using ToolSeoViet.Database.Models;
 
 namespace ToolSeoViet.Database {
+
     public partial class ToolSeoVietContext : DbContext {
         public DbSet<Permission> Permisstions { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -12,6 +13,7 @@ namespace ToolSeoViet.Database {
 
         //Content
         public DbSet<Heading> Headings { get; set; }
+
         public DbSet<Title> Titles { get; set; }
         public DbSet<SubTitle> SubTitles { get; set; }
         public DbSet<SearchContent> SearchContents { get; set; }
@@ -30,12 +32,11 @@ namespace ToolSeoViet.Database {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             if (!optionsBuilder.IsConfigured) {
-                optionsBuilder.UseNpgsql("Server=ec2-44-209-57-4.compute-1.amazonaws.com;Port=5432;Database=d6fbbhmk7vpd6t;User Id=leemwdukezeali;Password=780351960e6d24ef88842fad33ed7f3486f213b60dae01aeed022547c53029fc;sslmode=Require;TrustServerCertificate=True;");
+                optionsBuilder.UseSqlServer("");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            //modelBuilder.HasDefaultSchema("public");
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }

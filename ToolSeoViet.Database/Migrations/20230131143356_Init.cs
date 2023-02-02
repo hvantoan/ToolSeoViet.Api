@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ToolSeoViet.Database.Migrations
 {
-    public partial class Init_Data : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,13 +13,13 @@ namespace ToolSeoViet.Database.Migrations
                 name: "Permission",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    ParentId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    ClaimName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    DisplayName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Default = table.Column<bool>(type: "boolean", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    ParentId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    ClaimName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Default = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,9 +30,9 @@ namespace ToolSeoViet.Database.Migrations
                 name: "Role",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,10 +43,10 @@ namespace ToolSeoViet.Database.Migrations
                 name: "ViDictionary",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Word = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    IsMeaning = table.Column<bool>(type: "boolean", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Word = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    IsMeaning = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,9 +57,9 @@ namespace ToolSeoViet.Database.Migrations
                 name: "RolePermission",
                 columns: table => new
                 {
-                    RoleId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    PermissionId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    IsEnable = table.Column<bool>(type: "boolean", nullable: false)
+                    RoleId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    PermissionId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    IsEnable = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,14 +82,14 @@ namespace ToolSeoViet.Database.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    RoleId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    Username = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    Avatar = table.Column<string>(type: "text", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,10 +105,10 @@ namespace ToolSeoViet.Database.Migrations
                 name: "Project",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Domain = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UserId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Domain = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,10 +125,10 @@ namespace ToolSeoViet.Database.Migrations
                 name: "SearchContent",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
-                    UserId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    DateCreated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,14 +144,14 @@ namespace ToolSeoViet.Database.Migrations
                 name: "ProjectDetail",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Ordinal = table.Column<int>(type: "integer", nullable: false),
-                    Key = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    CurrentPosition = table.Column<int>(type: "integer", nullable: false),
-                    BestPosition = table.Column<int>(type: "integer", nullable: false),
-                    Url = table.Column<string>(type: "text", maxLength: 2147483647, nullable: true),
-                    ProjectId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Ordinal = table.Column<int>(type: "int", nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CurrentPosition = table.Column<int>(type: "int", nullable: false),
+                    BestPosition = table.Column<int>(type: "int", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    ProjectId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,11 +168,11 @@ namespace ToolSeoViet.Database.Migrations
                 name: "Heading",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Position = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", maxLength: 2147483647, nullable: true),
-                    Href = table.Column<string>(type: "text", maxLength: 2147483647, nullable: true),
-                    SearchContentId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    Href = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    SearchContentId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -188,10 +188,10 @@ namespace ToolSeoViet.Database.Migrations
                 name: "SLI",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    SearchContentId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Count = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    SearchContentId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Count = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,10 +207,10 @@ namespace ToolSeoViet.Database.Migrations
                 name: "SubTitle",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "text", maxLength: 2147483647, nullable: true),
-                    Position = table.Column<int>(type: "integer", nullable: false),
-                    HeadingId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    HeadingId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -226,10 +226,10 @@ namespace ToolSeoViet.Database.Migrations
                 name: "Title",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Name = table.Column<string>(type: "text", maxLength: 2147483647, nullable: true),
-                    Position = table.Column<int>(type: "integer", nullable: false),
-                    HeadingId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: true),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    HeadingId = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -268,11 +268,12 @@ namespace ToolSeoViet.Database.Migrations
             migrationBuilder.InsertData(
                 table: "RolePermission",
                 columns: new[] { "PermissionId", "RoleId", "IsEnable" },
-                values: new object[,]
-                {
-                    { "ec0f270b424249438540a16e9157c0c8", "469b14225a79448c93e4e780aa08f0cc", true },
-                    { "dc1c2ce584d74428b4e5241a5502787d", "6ffa9fa20755486d9e317d447b652bd8", true }
-                });
+                values: new object[] { "ec0f270b424249438540a16e9157c0c8", "469b14225a79448c93e4e780aa08f0cc", true });
+
+            migrationBuilder.InsertData(
+                table: "RolePermission",
+                columns: new[] { "PermissionId", "RoleId", "IsEnable" },
+                values: new object[] { "dc1c2ce584d74428b4e5241a5502787d", "6ffa9fa20755486d9e317d447b652bd8", true });
 
             migrationBuilder.InsertData(
                 table: "User",
